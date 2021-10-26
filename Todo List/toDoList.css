@@ -1,0 +1,72 @@
+html {
+    min-width: 400px;
+    min-height: 500px;
+    text-align: center;
+    font-size: 110%;
+  }
+
+  .container {
+      width: 400px;
+  }
+
+  #inputField {
+      width: 300px;
+      height: 46px;
+      border: 1px solid black;
+      font-size: 25px;
+      vertical-align: middle;
+  }
+
+  #addToDo {
+      height: 50px;
+      width: 50px;
+      border: 1px solid black;
+      vertical-align: middle;
+      font-size: 30px;
+  }
+
+  .to-dos {
+      margin-top: 25px;
+  }
+
+  .paragraph-styling{
+      margin: 0px;
+      cursor: pointer;
+      font-size: 20px;
+  }
+
+  #toDoList-welcome {
+    background-color: #008CBA; 
+    border: 1px solid black;
+    color: white;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    border-radius: 4px;
+    transition-duration: 0.4s;
+ }
+ 
+ #toDoList-welcome:hover {
+   background-color: #205668; 
+   color: white;
+ }
+ 
+ #toDoList-pomodoro {
+   background-color: #f44336; 
+   border: 1px solid black;
+   color: white;
+   padding: 15px 32px;
+   text-align: center;
+   text-decoration: none;
+   display: inline-block;
+   font-size: 16px;
+   border-radius: 4px;
+   transition-duration: 0.4s;
+ }
+ 
+ #toDoList-pomodoro:hover {
+   background-color: #772c26; 
+   color: white;
+ }
