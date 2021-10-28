@@ -1,13 +1,13 @@
 {
-    "name": "Schedule Manager",
-    "description": "Manage your time better with this cool and quirky app!",
-    "version": "1.0",
-    "manifest_version": 3,
-    "background": {
-      "service_worker": "./Welcome/welcome.js"
-    },
-    "permissions": ["storage"],
-    "action": {
-      "default_popup": "./Welcome/welcome.html"
-    }
+  "name": "Schedule Manager",
+  "description": "Manage your time better with this cool and quirky app!",
+  "version": "1.0",
+  "manifest_version": 3,
+  "background": {
+    "service_worker": "Welcome/welcome.js"
+  },
+  "permissions": ["storage"],
+  "action": {
+    "default_popup": "Welcome/welcome.html"
   }
+}
