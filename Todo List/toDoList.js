@@ -33,6 +33,7 @@ function removeItem(id) {
     var list = getList();
     delete list[id]
     setList(list);
+    // comment
 }
 
 addToDoButton.addEventListener('click', function(){
