@@ -1,6 +1,6 @@
-let addToDoButton = document.getElementById('addToDo');
-let toDoContainer = document.getElementById('toDoContainer');
-let inputField = document.getElementById('inputField');
+var addToDoButton = document.getElementById('addToDo');
+var toDoContainer = document.getElementById('toDoContainer');
+var inputField = document.getElementById('inputField');
 
 function getList() {
     var list = JSON.parse(localStorage.getItem("list"));
