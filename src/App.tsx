@@ -26,7 +26,7 @@ function getStorage(name: string) {
   return null
 }
 
-function UI(props) {
+function UI(props: any) {
   const [show, setShow] = useState(false)
   const [title, setTitle] = useState('')
   const [theme, setTheme] = useState('')
@@ -34,8 +34,8 @@ function UI(props) {
   const [colorDisplay, setColorDisplay] = useState(true)
   const [important, setImportant] = useState(false)
 
-  const [themes, setThemes] = useState(false)
-  const [options, setOptions] = useState(false)
+  const [themes, setThemes] = useState(getStorage('themes'))
+  const [options, setOptions] = useState([] as any[])
 
   const colorRef = useRef(null)
 
@@ -57,7 +57,7 @@ function UI(props) {
   function onSub(e: any) {
     e.preventDefault()
 
-    var itemTemp: {[key: string]: string | boolean} = {}
+    var itemTemp: any = {}
 
     if (theme.toLowerCase() !== 'none') {
       var themesTemp = getStorage('themes')
@@ -84,7 +84,7 @@ function UI(props) {
     props.setUpdate()
   }
 
-  function onChangeTheme(e) {
+  function onChangeTheme(e : any) {
     var theme = e.target.value
     setTheme(theme)
   }
@@ -162,10 +162,11 @@ function UI(props) {
   )
 }
 
-function Item(props) {
+function Item(props : any) {
 
   var themeColor = props.themes[props.color] || props.color;
 
+  console.log(props.color)
   return (
     // https://codepen.io/retrofuturistic/pen/DJWYBv
     <li draggable className="item" style={{color: themeColor, borderColor: themeColor, backgroundColor: themeColor + "15"}}>
@@ -174,7 +175,7 @@ function Item(props) {
   )
 }
 
-function Calendar(props) {
+function Calendar(props: any) {
   const [items, setItems] = useState([])
 
   useEffect(() => {
@@ -184,7 +185,7 @@ function Calendar(props) {
     if (!itemListTemp) {
       return;
     }
-    setItems(itemListTemp.map((e,i) => {
+    setItems(itemListTemp.map((e:any,i:number) => {
       return (<Item themes={themes} title={e.title} color={e.color} important={e.important}/>)
     }))
 
