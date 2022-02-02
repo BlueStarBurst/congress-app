@@ -1,7 +1,7 @@
 .App {
   height: 100%;
   width: 100%;
-  background-color: rgb(16, 16, 28);
+  background-color: rgb(27, 27, 27);
   color: white;
   display: block;
   position: relative;
@@ -10,21 +10,21 @@
 .ui {
   top: 100%;
   left: 100%;
-  width: 400px;
+  width: 100%;
   height: auto;
   display: flex;
-  justify-content: end;
+  justify-content: space-between;
+  flex-direction: row-reverse;
   position: absolute;
   transform: translate(-100%, -100%);
 }
 
 .ui div {
   padding: 2%;
-  margin: 7.5%;
-  border: 1.5px rgba(255, 255, 255, 0.178) solid;
-  border-radius: 1rem;
-  width: 3rem;
-  height: 3rem;
+  margin: 7%;
+  /* border: 1.5px rgba(255, 255, 255, 0.178) solid; */
+  width: 3.25rem;
+  height: 3.25rem;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -34,21 +34,48 @@
   transition: all 0.5s;
 }
 
-.ui div:hover {
-  cursor: pointer;
-  background-color: rgba(252, 242, 96, 0.719);
-  transition: all 0.5s;
+.add {
   border-radius: 3rem;
 }
 
-.ui div img {
-  width: 60%;
+.add:hover {
+  cursor: pointer;
+  background-color: rgba(97, 97, 97, 0.877);
+  transition: all 0.5s;
+  border-radius: 1rem;
+}
+
+.add:hover img {
   opacity: 0.3;
+}
+
+.ui div img {
+  transition: all 1s;
+  width: 60%;
+  opacity: 0.2;
+}
+
+
+.trash-off {
+  opacity: 0;
+  transform: translateY(20%);
+  pointer-events: none;
+}
+
+.trash-on {
+  opacity: 1;
+  pointer-events: all;
+  border-radius: 1rem;
+}
+
+.trash-on:hover {
+  background-color: rgba(252, 96, 96, 0.719);
+  border-radius: 3rem;
 }
 
 .calendar {
   width: auto;
-  height: auto;
+  height: 100%;
   padding: 5%;
   overflow-y: auto;
   list-style: none;
@@ -63,6 +90,20 @@
   border-style: solid;
   border-radius: 1rem;
   padding: 5%;
-  margin-bottom: 2%;
   cursor: grab;
+}
+
+li {
+  margin-bottom: 3%;
+}
+
+.btn-primary {
+  color: #fff !important;
+  background-color: #0d6efd !important;
+  border-color: #0d6efd !important;
+}
+
+.btn-primary:hover {
+  background-color: #175dc5 !important;
+  border-color: #175dc5 !important;
 }

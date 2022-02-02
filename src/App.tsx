@@ -11,8 +11,11 @@ import {
 } from 'react-bootstrap'
 
 import { TwitterPicker } from 'react-color'
+import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd'
 
-import 'bootstrap/dist/css/bootstrap.min.css'
+// import 'bootstrap/dist/css/bootstrap.min.css'
+import 'bootstrap-dark-5/dist/css/bootstrap-dark.min.css'
+
 
 function setStorage(name: string, value: any) {
   localStorage.setItem(name, JSON.stringify(value))
@@ -54,6 +57,10 @@ function UI(props: any) {
     setOptions(tempOptions)
   }, [show])
 
+  useEffect(() => {
+    props.setDeleting(false)
+  },[props.dragging])
+
   function onSub(e: any) {
     e.preventDefault()
 
@@ -71,9 +78,9 @@ function UI(props: any) {
     itemTemp['title'] = title
     itemTemp['important'] = important
 
-    var itemListTemp = getStorage('items') || [];
-    itemListTemp.push(itemTemp);
-    setStorage('items', itemListTemp);
+    var itemListTemp = getStorage('items') || []
+    itemListTemp.push(itemTemp)
+    setStorage('items', itemListTemp)
 
     setTitle('')
     setTheme('')
@@ -84,17 +91,38 @@ function UI(props: any) {
     props.setUpdate()
   }
 
-  function onChangeTheme(e : any) {
-    var theme = e.target.value
+  function onChangeTheme(e: any) {
+    var theme = e.target.value;
+    if (Object.keys(themes).includes(theme)) {
+      setColor(themes[theme]);
+    }
     setTheme(theme)
+    
+  }
+
+  function deleteDragIn(e: any) {
+    if (props.dragging) {
+      props.setDeleting(true)
+    }
+  }
+
+  function deleteDragOut(e: any) {
+    if (props.dragging) {
+      props.setDeleting(false)
+    }
   }
 
   return (
     <div className="ui">
-      <div onClick={() => setShow(true)}>
+      <div className="add" onClick={() => setShow(true)}>
         <img src="./imgs/plusWhite.png" />
       </div>
-      <Modal size="sm" show={show} onHide={() => setShow(false)}>
+
+      <div onMouseEnter={deleteDragIn} onMouseLeave={deleteDragOut} className={(props.dragging) ? 'trash-on' : 'trash-off'}>
+        <img src="./imgs/xWhite.png" />
+      </div>
+
+      <Modal  size="sm" show={show} onHide={() => setShow(false)}>
         <Modal.Header closeButton>
           <h1>Add an Event</h1>
         </Modal.Header>
@@ -125,7 +153,7 @@ function UI(props: any) {
 
             <InputGroup className="mb-3">
               <InputGroup.Text
-                style={{ width: '8%', backgroundColor: color }}
+                style={{ width: '2.5rem', backgroundColor: color }}
                 id="title"
               ></InputGroup.Text>
               <FormControl
@@ -162,16 +190,30 @@ function UI(props: any) {
   )
 }
 
-function Item(props : any) {
+function Item(props: any) {
+  var themeColor = props.themes[props.color] || props.color
+  var id = props.index
 
-  var themeColor = props.themes[props.color] || props.color;
+  const styles = {
+    color: themeColor,
+    borderColor: themeColor,
+    backgroundColor: themeColor + '15',
+  }
 
-  console.log(props.color)
   return (
-    // https://codepen.io/retrofuturistic/pen/DJWYBv
-    <li draggable className="item" style={{color: themeColor, borderColor: themeColor, backgroundColor: themeColor + "15"}}>
-      <p>{props.title}</p>
-    </li>
+    <Draggable key={props.title} draggableId={props.title} index={id}>
+      {(provided) => (
+        <li
+          ref={provided.innerRef}
+          {...provided.draggableProps}
+          {...provided.dragHandleProps}
+        >
+          <div style={styles} className="item">
+            <p>{props.title}</p>
+          </div>
+        </li>
+      )}
+    </Draggable>
   )
 }
 
@@ -179,33 +221,111 @@ function Calendar(props: any) {
   const [items, setItems] = useState([])
 
   useEffect(() => {
-    console.log("update")
-    var themes = getStorage('themes');
-    var itemListTemp = getStorage('items'); 
+    console.log('update')
+    var themes = getStorage('themes')
+    var itemListTemp = getStorage('items')
     if (!itemListTemp) {
-      return;
+      return
     }
-    setItems(itemListTemp.map((e:any,i:number) => {
-      return (<Item themes={themes} title={e.title} color={e.color} important={e.important}/>)
-    }))
-
+    setItems(
+      itemListTemp.map((e: any, i: number) => {
+        return (
+          <Item
+            themes={themes}
+            title={e.title}
+            color={e.color}
+            important={e.important}
+            index={i}
+          />
+        )
+      }),
+    )
   }, [props.update])
 
+  function dragEnd(result: any) {
+    if (!result.destination) return
+
+    var itemListTemp = getStorage('items')
+    var themes = getStorage('themes')
+
+    if (props.deleting) {
+      itemListTemp.splice(result.destination.index, 1)
+      console.log(itemListTemp)
+      setStorage('items', itemListTemp)
+      setItems(
+        itemListTemp.map((e: any, i: number) => {
+          return (
+            <Item
+              themes={themes}
+              title={e.title}
+              color={e.color}
+              important={e.important}
+              index={i}
+            />
+          )
+        }),
+      )
+      props.setDragging(false)
+      return;
+    }
+
+    console.log(result)
+
+    
+    const [reorderedItem] = itemListTemp.splice(result.source.index, 1)
+    itemListTemp.splice(result.destination.index, 0, reorderedItem)
+    setStorage('items', itemListTemp)
+    
+    setItems(
+      itemListTemp.map((e: any, i: number) => {
+        return (
+          <Item
+            themes={themes}
+            title={e.title}
+            color={e.color}
+            important={e.important}
+            index={i}
+          />
+        )
+      }),
+    )
+    props.setDragging(false)
+  }
+
   return (
-    <ul className="calendar">
-      {items}
-    </ul>
+    <DragDropContext
+      onDragEnd={dragEnd}
+      onDragStart={() => props.setDragging(true)}
+    >
+      <Droppable droppableId="calendar">
+        {(provided) => (
+          <ul
+            className="calendar"
+            ref={provided.innerRef}
+            {...provided.droppableProps}
+          >
+            {items}
+            {provided.placeholder}
+          </ul>
+        )}
+      </Droppable>
+    </DragDropContext>
   )
 }
 
 function App() {
-
   const [update, setUpdate] = useState(true)
+  const [dragging, setDragging] = useState(false)
+  const [deleting, setDeleting] = useState(false)
+
+  useEffect(() => {
+    console.log('dragging')
+  })
 
   return (
     <div className="App">
-      <Calendar update={update} />
-      <UI setUpdate={() => setUpdate(!update)} />
+      <Calendar deleting={deleting} update={update} setDragging={setDragging} />
+      <UI setDeleting={setDeleting} dragging={dragging} setUpdate={() => setUpdate(!update)} />
     </div>
   )
 }
