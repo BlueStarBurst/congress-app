@@ -1,7 +1,7 @@
 {
   "name": "Scheduler",
-  "description": "The power of React and TypeScript for building interactive Chrome extensions",
-  "version": "1.0",
+  "description": "An app that helps keep track of stuff!",
+  "version": "0.1",
   "manifest_version": 3,
   "action": {
       "default_popup": "index.html",
