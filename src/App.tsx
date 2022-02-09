@@ -16,7 +16,6 @@ import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd'
 // import 'bootstrap/dist/css/bootstrap.min.css'
 import 'bootstrap-dark-5/dist/css/bootstrap-dark.min.css'
 
-
 function setStorage(name: string, value: any) {
   localStorage.setItem(name, JSON.stringify(value))
 }
@@ -32,8 +31,8 @@ function getStorage(name: string) {
 function UI(props: any) {
   const [show, setShow] = useState(false)
   const [title, setTitle] = useState('')
-  const [theme, setTheme] = useState('')
-  const [color, setColor] = useState('')
+  const [theme, setTheme] = useState('None')
+  const [color, setColor] = useState('#ABB8C3')
   const [colorDisplay, setColorDisplay] = useState(true)
   const [important, setImportant] = useState(false)
 
@@ -41,17 +40,20 @@ function UI(props: any) {
   const [options, setOptions] = useState([] as any[])
 
   const colorRef = useRef(null)
+  const titleRef = useRef<any>(null)
 
   useEffect(() => {
+    if (titleRef.current) {
+      titleRef.current.focus();
+    }
     setThemes(getStorage('themes'))
-
     var tempOptions: any[] = []
     if (themes) {
       Object.keys(themes).forEach((element) => {
         tempOptions.push(<option value={element}>{element}</option>)
       })
     } else {
-      setStorage('themes', { None: null })
+      setStorage('themes', { None: '#ABB8C3' })
       tempOptions = [<option value={'None'}>None</option>]
     }
     setOptions(tempOptions)
@@ -59,7 +61,7 @@ function UI(props: any) {
 
   useEffect(() => {
     props.setDeleting(false)
-  },[props.dragging])
+  }, [props.dragging])
 
   function onSub(e: any) {
     e.preventDefault()
@@ -83,8 +85,8 @@ function UI(props: any) {
     setStorage('items', itemListTemp)
 
     setTitle('')
-    setTheme('')
-    setColor('')
+    setTheme('None')
+    setColor('#ABB8C3')
     setImportant(false)
 
     setShow(false)
@@ -92,12 +94,11 @@ function UI(props: any) {
   }
 
   function onChangeTheme(e: any) {
-    var theme = e.target.value;
+    var theme = e.target.value
     if (Object.keys(themes).includes(theme)) {
-      setColor(themes[theme]);
+      setColor(themes[theme])
     }
     setTheme(theme)
-    
   }
 
   function deleteDragIn(e: any) {
@@ -118,11 +119,15 @@ function UI(props: any) {
         <img src="./imgs/plusWhite.png" />
       </div>
 
-      <div onMouseEnter={deleteDragIn} onMouseLeave={deleteDragOut} className={(props.dragging) ? 'trash-on' : 'trash-off'}>
+      <div
+        onMouseEnter={deleteDragIn}
+        onMouseLeave={deleteDragOut}
+        className={props.dragging ? 'trash-on' : 'trash-off'}
+      >
         <img src="./imgs/xWhite.png" />
       </div>
 
-      <Modal  size="sm" show={show} onHide={() => setShow(false)}>
+      <Modal size="sm" show={show} onHide={() => setShow(false)}>
         <Modal.Header closeButton>
           <h1>Add an Event</h1>
         </Modal.Header>
@@ -131,9 +136,11 @@ function UI(props: any) {
             <InputGroup className="mb-3">
               <InputGroup.Text id="title">Title</InputGroup.Text>
               <FormControl
+                ref={titleRef}
                 placeholder="Name of Event"
                 defaultValue={title}
                 required
+                autoFocus
                 onChange={(e) => setTitle(e.target.value)}
               />
             </InputGroup>
@@ -169,6 +176,19 @@ function UI(props: any) {
               <TwitterPicker
                 onChangeComplete={(e: any) => setColor(e.hex)}
                 className="mb-3"
+                colors={[
+                  '#FF6900',
+                  '#FCB900',
+                  '#7BDCB5',
+                  '#00D084',
+                  '#8ED1FC',
+                  '#0693E3',
+                  '#ABB8C3',
+                  '#EB144C',
+                  '#F78DA7',
+                  '#9900EF',
+                ]}
+                color={color}
               />
             ) : null}
 
@@ -209,6 +229,8 @@ function Item(props: any) {
           {...provided.dragHandleProps}
         >
           <div style={styles} className="item">
+            <div className="item-over">
+            </div>
             <p>{props.title}</p>
           </div>
         </li>
@@ -243,13 +265,16 @@ function Calendar(props: any) {
   }, [props.update])
 
   function dragEnd(result: any) {
+
+    console.log(result)
+
     if (!result.destination) return
 
     var itemListTemp = getStorage('items')
     var themes = getStorage('themes')
 
     if (props.deleting) {
-      itemListTemp.splice(result.destination.index, 1)
+      itemListTemp.splice(result.source.index, 1)
       console.log(itemListTemp)
       setStorage('items', itemListTemp)
       setItems(
@@ -266,16 +291,15 @@ function Calendar(props: any) {
         }),
       )
       props.setDragging(false)
-      return;
+      return
     }
 
     console.log(result)
 
-    
     const [reorderedItem] = itemListTemp.splice(result.source.index, 1)
     itemListTemp.splice(result.destination.index, 0, reorderedItem)
     setStorage('items', itemListTemp)
-    
+
     setItems(
       itemListTemp.map((e: any, i: number) => {
         return (
@@ -325,7 +349,11 @@ function App() {
   return (
     <div className="App">
       <Calendar deleting={deleting} update={update} setDragging={setDragging} />
-      <UI setDeleting={setDeleting} dragging={dragging} setUpdate={() => setUpdate(!update)} />
+      <UI
+        setDeleting={setDeleting}
+        dragging={dragging}
+        setUpdate={() => setUpdate(!update)}
+      />
     </div>
   )
 }
