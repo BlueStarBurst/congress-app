@@ -4,6 +4,8 @@
 /node_modules
 /.pnp
 .pnp.js
+/secure
+/secure2
 
 # testing
 /coverage
@@ -25,5 +27,3 @@ yarn.lock
 
 build.crx
 build.pem
-
-/secure
