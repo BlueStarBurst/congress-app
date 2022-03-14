@@ -15,6 +15,9 @@ import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd'
 
 // import 'bootstrap/dist/css/bootstrap.min.css'
 import 'bootstrap-dark-5/dist/css/bootstrap-dark.min.css'
+import { httpPostAsync } from './serverHandler'
+import internal from 'stream'
+import { IntervalHistogram } from 'perf_hooks'
 
 function setStorage(name: string, value: any) {
   localStorage.setItem(name, JSON.stringify(value))
@@ -42,9 +45,42 @@ function UI(props: any) {
   const colorRef = useRef(null)
   const titleRef = useRef<any>(null)
 
+  const [showSyncTab, setShowSyncTab] = useState('syncTab')
+  const userRef = useRef(null)
+  const [user, setUser] = useState('')
+  const passRef = useRef(null)
+  const [pass, setPass] = useState('')
+
+  let checkEx: any
+
+  function unAuth() {
+    clearInterval(checkEx)
+    checkEx = ''
+    localStorage.removeItem('session')
+    setShowSyncTab('sync-inactive syncTab')
+  }
+
+  function onAuth(data: any) {
+    console.log(data)
+    setShowSyncTab('sync-dis syncTab')
+    console.log('yeah ok math checks out')
+  }
+
+  useEffect(() => {
+    if (localStorage.getItem("session")) {
+      setShowSyncTab('sync-dis syncTab')
+    } else {
+      setShowSyncTab('sync-inactive syncTab')
+    }
+    
+    checkEx = setInterval(() => {
+      httpPostAsync('/auth', '', onAuth, console.log, unAuth)
+    }, 5000)
+  }, [])
+
   useEffect(() => {
     if (titleRef.current) {
-      titleRef.current.focus();
+      titleRef.current.focus()
     }
     setThemes(getStorage('themes'))
     var tempOptions: any[] = []
@@ -113,99 +149,179 @@ function UI(props: any) {
     }
   }
 
+  function handleSyncClick(e: any) {
+    if (localStorage.getItem('session')) {
+      setShowSyncTab('sync-dis syncTab')
+      return
+    }
+
+    // console.log(e)
+    if (e.target.id == 'sync') {
+      if (showSyncTab === 'sync-inactive syncTab') {
+        setShowSyncTab('syncTab')
+      } else {
+        setShowSyncTab('sync-inactive syncTab')
+      }
+    }
+  }
+
+  function handleAuth(data: string, e: any) {
+    localStorage.setItem('session', data)
+    setShowSyncTab('sync-dis syncTab')
+    checkEx = setInterval(() => {
+      httpPostAsync('/auth', '', onAuth, console.log, unAuth)
+    }, 5000)
+  }
+
+  function handleSyncBtnClick(e: any) {
+    e.preventDefault()
+
+    if (localStorage.getItem('session')) {
+      setShowSyncTab('sync-inactive syncTab')
+      return
+    }
+
+    console.log(user + '  ' + pass)
+    httpPostAsync(
+      '/login',
+      'user=' + user + '&pass=' + pass + '&time=' + 10000,
+      (data) => {
+        handleAuth(data, e)
+      },
+      () => setShowSyncTab('sync-inactive syncTab'),
+    )
+    // setShowSyncTab("sync-dis syncTab")
+  }
+
   return (
     <div className="ui">
-      <div className="add" onClick={() => setShow(true)}>
-        <img src="./imgs/plusWhite.png" />
+      <div className="ui-main">
+        <div className="add" onClick={() => setShow(true)}>
+          <img src="./imgs/plusWhite.png" />
+        </div>
+
+        <div
+          onMouseEnter={deleteDragIn}
+          onMouseLeave={deleteDragOut}
+          className={props.dragging ? 'trash-on' : 'trash-off'}
+        >
+          <img src="./imgs/xWhite.png" />
+        </div>
+
+        <Modal size="sm" show={show} onHide={() => setShow(false)}>
+          <Modal.Header closeButton>
+            <h1>Add an Event</h1>
+          </Modal.Header>
+          <Form onSubmit={onSub}>
+            <Modal.Body>
+              <InputGroup className="mb-3">
+                <InputGroup.Text id="title">Title</InputGroup.Text>
+                <FormControl
+                  ref={titleRef}
+                  placeholder="Name of Event"
+                  defaultValue={title}
+                  required
+                  autoFocus
+                  onChange={(e) => setTitle(e.target.value)}
+                />
+              </InputGroup>
+
+              <InputGroup className="mb-3">
+                <InputGroup.Text id="title">Theme</InputGroup.Text>
+                <FormControl
+                  required
+                  list="list"
+                  placeholder="Theme"
+                  defaultValue={theme}
+                  onChange={onChangeTheme}
+                />
+
+                <datalist id="list">{options}</datalist>
+              </InputGroup>
+
+              <InputGroup className="mb-3">
+                <InputGroup.Text
+                  style={{ width: '2.5rem', backgroundColor: color }}
+                  id="title"
+                ></InputGroup.Text>
+                <FormControl
+                  required
+                  ref={colorRef}
+                  placeholder="(will set the theme to this color)"
+                  value={color}
+                  onChange={(e) => setColor(e.target.value)}
+                />
+              </InputGroup>
+
+              {colorDisplay ? (
+                <TwitterPicker
+                  onChangeComplete={(e: any) => setColor(e.hex)}
+                  className="mb-3"
+                  colors={[
+                    '#FF6900',
+                    '#FCB900',
+                    '#7BDCB5',
+                    '#00D084',
+                    '#8ED1FC',
+                    '#0693E3',
+                    '#ABB8C3',
+                    '#EB144C',
+                    '#F78DA7',
+                    '#9900EF',
+                  ]}
+                  color={color}
+                />
+              ) : null}
+
+              <FormCheck
+                label="Important"
+                checked={important}
+                onChange={(e) => setImportant(e.target.checked)}
+              />
+            </Modal.Body>
+            <Modal.Footer>
+              <Button onClick={() => setShow(false)} variant="secondary">
+                Cancel
+              </Button>
+              <Button type="submit">Submit</Button>
+            </Modal.Footer>
+          </Form>
+        </Modal>
       </div>
-
-      <div
-        onMouseEnter={deleteDragIn}
-        onMouseLeave={deleteDragOut}
-        className={props.dragging ? 'trash-on' : 'trash-off'}
-      >
-        <img src="./imgs/xWhite.png" />
-      </div>
-
-      <Modal size="sm" show={show} onHide={() => setShow(false)}>
-        <Modal.Header closeButton>
-          <h1>Add an Event</h1>
-        </Modal.Header>
-        <Form onSubmit={onSub}>
-          <Modal.Body>
-            <InputGroup className="mb-3">
-              <InputGroup.Text id="title">Title</InputGroup.Text>
-              <FormControl
-                ref={titleRef}
-                placeholder="Name of Event"
-                defaultValue={title}
-                required
-                autoFocus
-                onChange={(e) => setTitle(e.target.value)}
-              />
-            </InputGroup>
-
-            <InputGroup className="mb-3">
-              <InputGroup.Text id="title">Theme</InputGroup.Text>
-              <FormControl
-                required
-                list="list"
-                placeholder="Theme"
-                defaultValue={theme}
-                onChange={onChangeTheme}
-              />
-
-              <datalist id="list">{options}</datalist>
-            </InputGroup>
-
-            <InputGroup className="mb-3">
-              <InputGroup.Text
-                style={{ width: '2.5rem', backgroundColor: color }}
-                id="title"
-              ></InputGroup.Text>
-              <FormControl
-                required
-                ref={colorRef}
-                placeholder="(will set the theme to this color)"
-                value={color}
-                onChange={(e) => setColor(e.target.value)}
-              />
-            </InputGroup>
-
-            {colorDisplay ? (
-              <TwitterPicker
-                onChangeComplete={(e: any) => setColor(e.hex)}
-                className="mb-3"
-                colors={[
-                  '#FF6900',
-                  '#FCB900',
-                  '#7BDCB5',
-                  '#00D084',
-                  '#8ED1FC',
-                  '#0693E3',
-                  '#ABB8C3',
-                  '#EB144C',
-                  '#F78DA7',
-                  '#9900EF',
-                ]}
-                color={color}
-              />
-            ) : null}
-
-            <FormCheck
-              label="Important"
-              checked={important}
-              onChange={(e) => setImportant(e.target.checked)}
+      <div id="sync" className={showSyncTab} onClick={handleSyncClick}>
+        <Form
+          style={{ width: '100%' }}
+          onSubmit={handleSyncBtnClick}
+          autoComplete="on"
+        >
+          <InputGroup className="mb-0">
+            <InputGroup.Text id="user">User</InputGroup.Text>
+            <FormControl
+              ref={userRef}
+              placeholder="User Name"
+              required
+              autoComplete="username"
+              autoFocus
+              onChange={(e) => setUser(e.target.value)}
             />
-          </Modal.Body>
-          <Modal.Footer>
-            <Button onClick={() => setShow(false)} variant="secondary">
-              Cancel
-            </Button>
-            <Button type="submit">Submit</Button>
-          </Modal.Footer>
+          </InputGroup>
+          <InputGroup className="mb-0">
+            <InputGroup.Text id="pass">Pass</InputGroup.Text>
+            <FormControl
+              ref={passRef}
+              placeholder="Password"
+              autoComplete="password"
+              required
+              autoFocus
+              onChange={(e) => setPass(e.target.value)}
+            />
+          </InputGroup>
+
+          <Button type="submit" className="w-100">
+            Submit
+          </Button>
         </Form>
-      </Modal>
+      </div>
     </div>
   )
 }
@@ -229,8 +345,7 @@ function Item(props: any) {
           {...provided.dragHandleProps}
         >
           <div style={styles} className="item">
-            <div className="item-over">
-            </div>
+            <div className="item-over"></div>
             <p>{props.title}</p>
           </div>
         </li>
@@ -265,7 +380,6 @@ function Calendar(props: any) {
   }, [props.update])
 
   function dragEnd(result: any) {
-
     console.log(result)
 
     if (!result.destination) return
