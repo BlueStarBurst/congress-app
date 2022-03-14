@@ -1,6 +1,6 @@
 import express from 'express';
 import bodyParser from 'body-parser';
-// import Data from './data.mjs';
+import Data from './data.mjs';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import bcrypt from 'bcrypt'
@@ -91,7 +91,7 @@ app.post('/auth', function (req, res) {
   console.log("POST /auth")
 });
 
-app.post('/ticketShowRequests', function (req, res) {
+app.post('/getData', function (req, res) {
   if (!uuids[req.headers.authorization]) {
     res.sendStatus(401)
     return;
@@ -114,6 +114,11 @@ app.post('/login', function (req, res) {
       uuids[genuuid] = res;
       console.log(genuuid);
       console.log(Object.keys(uuids));
+
+      if (!req.body.time) {
+        res.send(genuuid)
+        return;
+      }
 
       setTimeout(() => {
         console.log("session " + genuuid + " has expired!")

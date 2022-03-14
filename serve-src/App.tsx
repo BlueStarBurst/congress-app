@@ -19,8 +19,6 @@ import { httpPostAsync } from './serverHandler'
 import internal from 'stream'
 import { IntervalHistogram } from 'perf_hooks'
 
-// window.location.href = "https://localhost:5000/"
-
 function setStorage(name: string, value: any) {
   localStorage.setItem(name, JSON.stringify(value))
 }
@@ -49,53 +47,36 @@ function UI(props: any) {
 
   const [showSyncTab, setShowSyncTab] = useState('syncTab')
   const userRef = useRef(null)
-  const [user, setUser] = useState(localStorage.getItem('user') || '')
+  const [user, setUser] = useState('')
   const passRef = useRef(null)
-  const [pass, setPass] = useState(localStorage.getItem('pass') || '')
-  const [isLoggedIn, setIsLoggedIn] = useState(true)
+  const [pass, setPass] = useState('')
 
   let checkEx: any
 
-  function handleError() {
-    setShowSyncTab('sync-inactive syncTab')
-    setIsLoggedIn(false)
-  }
-
-  function unAuth(e: any) {
-    console.log(e)
+  function unAuth() {
+    clearInterval(checkEx)
+    checkEx = ''
     localStorage.removeItem('session')
     setShowSyncTab('sync-inactive syncTab')
-    setIsLoggedIn(false)
   }
 
   function onAuth(data: any) {
     console.log(data)
-    setIsLoggedIn(true)
     setShowSyncTab('sync-dis syncTab')
     console.log('yeah ok math checks out')
   }
 
-  function handleAuth(data: string) {
-    localStorage.setItem('session', data)
-    setShowSyncTab('sync-dis syncTab')
-  }
-
   useEffect(() => {
-    httpPostAsync('/auth', '', onAuth, console.log, unAuth)
-  }, [])
-
-  useEffect(() => {
-    if (!localStorage.getItem('session')) {
-      if (user !== '' && pass !== '') {
-        httpPostAsync(
-          '/login',
-          'user=' + user + '&pass=' + pass,
-          handleAuth,
-          handleError,
-        )
-      }
+    if (localStorage.getItem("session")) {
+      setShowSyncTab('sync-dis syncTab')
+    } else {
+      setShowSyncTab('sync-inactive syncTab')
     }
-  }, [isLoggedIn])
+    
+    checkEx = setInterval(() => {
+      httpPostAsync('/auth', '', onAuth, console.log, unAuth)
+    }, 5000)
+  }, [])
 
   useEffect(() => {
     if (titleRef.current) {
@@ -184,6 +165,14 @@ function UI(props: any) {
     }
   }
 
+  function handleAuth(data: string, e: any) {
+    localStorage.setItem('session', data)
+    setShowSyncTab('sync-dis syncTab')
+    checkEx = setInterval(() => {
+      httpPostAsync('/auth', '', onAuth, console.log, unAuth)
+    }, 5000)
+  }
+
   function handleSyncBtnClick(e: any) {
     e.preventDefault()
 
@@ -193,12 +182,13 @@ function UI(props: any) {
     }
 
     console.log(user + '  ' + pass)
-
-    localStorage.setItem('user', user)
-    localStorage.setItem('pass', pass)
-
-    httpPostAsync('/login', 'user=' + user + '&pass=' + pass, handleAuth, () =>
-      setShowSyncTab('sync-inactive syncTab'),
+    httpPostAsync(
+      '/login',
+      'user=' + user + '&pass=' + pass + '&time=' + 10000,
+      (data) => {
+        handleAuth(data, e)
+      },
+      () => setShowSyncTab('sync-inactive syncTab'),
     )
     // setShowSyncTab("sync-dis syncTab")
   }
@@ -310,7 +300,6 @@ function UI(props: any) {
               ref={userRef}
               placeholder="User Name"
               required
-              defaultValue={user}
               autoComplete="username"
               autoFocus
               onChange={(e) => setUser(e.target.value)}
@@ -323,7 +312,6 @@ function UI(props: any) {
               placeholder="Password"
               autoComplete="password"
               required
-              defaultValue={pass}
               autoFocus
               onChange={(e) => setPass(e.target.value)}
             />
