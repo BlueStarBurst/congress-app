@@ -1,7 +1,7 @@
 export function httpPostAsync(theUrl, data, callback = console.log, error = console.log, unAuth = console.log) {
     var xmlHttp = new XMLHttpRequest();
 
-    xmlHttp.open("POST", 'https://localhost:5000' + theUrl, true); // true for asynchronous 
+    xmlHttp.open("POST", 'https://blue-scheduler.herokuapp.com' + theUrl, true); // true for asynchronous 
     xmlHttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
     xmlHttp.setRequestHeader('Authorization', localStorage.getItem("session"));
 

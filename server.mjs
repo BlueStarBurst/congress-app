@@ -151,16 +151,16 @@ app.post('/login', function (req, res) {
       console.log(genuuid);
       console.log(Object.keys(uuids));
 
-      if (!req.body.time) {
-        res.send(genuuid)
-        return;
-      }
+      // if (!req.body.time) {
+      //   res.send(genuuid)
+      //   return;
+      // }
 
       setTimeout(() => {
         console.log("session " + genuuid + " has expired!")
         delete uuids[genuuid];
         console.log(Object.keys(uuids))
-      }, req.body.time);
+      }, 300000);
       res.send(genuuid)
     } else {
       res.sendStatus(400);
