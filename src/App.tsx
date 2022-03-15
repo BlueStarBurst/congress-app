@@ -100,7 +100,13 @@ function UI(props: any) {
   }
 
   useEffect(() => {
-    httpPostAsync('/auth', '', onAuth, unAuth, unAuth)
+    httpPostAsync(
+      '/login',
+      'user=' + user + '&pass=' + pass,
+      handleAuth,
+      handleError,
+    )
+    // httpPostAsync('/auth', '', onAuth, unAuth, unAuth)
   }, [props.toggleNeedsRefresh])
 
   useEffect(() => {
