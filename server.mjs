@@ -5,6 +5,7 @@ import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import bcrypt from 'bcrypt'
 import { readFileSync, readFile } from 'fs';
+import { Server } from 'http'
 import { Server as HttpsServer } from 'https'
 
 import cors from 'cors'
@@ -41,11 +42,11 @@ if (httpsEnabled) {
     app,
   )
 } else {
-  server = new HttpsServer(
-    credentials,
-    app,
-  )
-  // server = new Server(app);
+  // server = new HttpsServer(
+  //   credentials,
+  //   app,
+  // )
+  server = new Server(app);
 }
 
 const corsOptions = {
@@ -211,5 +212,5 @@ server.listen(port)
 console.log('listening on port: ' + port)
 // console.log('listening on port 5000');
 
-console.log(bcrypt.hashSync("4uBRxb5Y66DFPb5", bcrypt.genSaltSync()))
-console.log(bcrypt.hashSync("testing", bcrypt.genSaltSync()))
+// console.log(bcrypt.hashSync("4uBRxb5Y66DFPb5", bcrypt.genSaltSync()))
+// console.log(bcrypt.hashSync("testing", bcrypt.genSaltSync()))
