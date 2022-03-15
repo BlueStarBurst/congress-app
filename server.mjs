@@ -2,7 +2,7 @@ import express from 'express';
 import bodyParser from 'body-parser';
 import Data from './data.mjs';
 import { fileURLToPath } from 'url';
-import { dirname } from 'path';
+import { dirname, join } from 'path';
 import bcrypt from 'bcrypt'
 import { readFileSync, readFile } from 'fs';
 import { Server as HttpsServer } from 'https'
@@ -10,6 +10,13 @@ import { Server as HttpsServer } from 'https'
 import cors from 'cors'
 
 import { v4 } from 'uuid';
+
+const httpsEnabled = !!process.env.HTTPS
+
+const port = process.env.PORT || (httpsEnabled ? '443' : '9736')
+
+const sslCertificatePath = process.env.SSLPATH || process.cwd()
+
 // const { v4: uuidv4 } = pkg;
 const uuidv4 = v4;
 
@@ -23,10 +30,23 @@ const __dirname = dirname(__filename);
 
 const app = express()
 
-let server = new HttpsServer(
-  credentials,
-  app,
-)
+let server;
+
+if (httpsEnabled) {
+  server = new HttpsServer(
+    {
+      key: readFileSync(join(sslCertificatePath, 'privkey.pem')),
+      cert: readFileSync(join(sslCertificatePath, 'fullchain.pem')),
+    },
+    app,
+  )
+} else {
+  server = new HttpsServer(
+    credentials,
+    app,
+  )
+  // server = new Server(app);
+}
 
 const corsOptions = {
   origin: '*',
@@ -187,8 +207,9 @@ app.use(express.static('build', options))
 // httpsServer.listen(443)
 // console.log('listening on port 443');
 
-server.listen(5000);
-console.log('listening on port 5000');
+server.listen(port)
+console.log('listening on port: ' + port)
+// console.log('listening on port 5000');
 
 console.log(bcrypt.hashSync("4uBRxb5Y66DFPb5", bcrypt.genSaltSync()))
 console.log(bcrypt.hashSync("testing", bcrypt.genSaltSync()))
