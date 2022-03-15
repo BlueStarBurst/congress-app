@@ -1,0 +1,56 @@
+html {
+  background-color: black;
+}
+
+body {
+  width: 325px;
+  height: 500px;
+  background-color: black;
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#root {
+  width: 100%;
+  height: 100%;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+/* .modal-header {
+  border-bottom-color: rgb(56, 61, 63) !important;
+}
+
+.modal-content {
+  background-color: rgb(24, 26, 27) !important;
+  border-color: rgba(140, 130, 115, 0.2) !important;
+  outline-color: initial;
+} */
+
+.twitter-picker {
+  background-color: rgb(34, 34, 34) !important;
+}
+
+.twitter-picker div:nth-child(2) {
+  border-color: transparent transparent rgb(34, 34, 34) !important;
+}
+
+.twitter-picker div div:nth-child(11) {
+  background-color: #3b3b3b !important;
+  border: 1px solid #515151 !important;
+  color: #b1b1b1 !important;
+}
+
+.twitter-picker div div:nth-child(12) input {
+  background-color: #3b3b3b !important;
+  /* border: 1px solid #515151 !important; */
+  box-shadow: #515151 0px 0px 0px 1px inset !important;
+  color: #b1b1b1 !important;
+}
