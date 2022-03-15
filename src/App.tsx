@@ -92,6 +92,8 @@ function UI(props: any) {
   }
 
   function handleAuth(data: string) {
+    localStorage.setItem('user', user)
+    localStorage.setItem('pass', pass)
     localStorage.setItem('session', data)
     setShowSyncTab('sync-dis syncTab')
     props.setLoggedIn(true)
@@ -103,7 +105,7 @@ function UI(props: any) {
 
   useEffect(() => {
     if (!localStorage.getItem('session')) {
-      if (user !== '' && pass !== '') {
+      if (localStorage.getItem('user') && localStorage.getItem('user')) {
         interval = setInterval(() => {
           httpPostAsync(
             '/login',
@@ -211,7 +213,7 @@ function UI(props: any) {
   }
 
   function handleSyncBtnClick(e: any) {
-    // e.preventDefault()
+    e.preventDefault()
 
     if (localStorage.getItem('session')) {
       setShowSyncTab('sync-inactive syncTab')
@@ -220,8 +222,7 @@ function UI(props: any) {
 
     // console.log(user + '  ' + pass)
 
-    localStorage.setItem('user', user)
-    localStorage.setItem('pass', pass)
+    
 
     httpPostAsync('/login', 'user=' + user + '&pass=' + pass, handleAuth, () =>
       setShowSyncTab('sync-inactive syncTab'),
@@ -440,6 +441,9 @@ function Calendar(props: any) {
   }
 
   function attemptServerUpdateData() {
+    if (!props.loggedIn) {
+      return;
+    }
     httpPostAsync(
       '/setData',
       'user=' +
