@@ -8,6 +8,16 @@
   overflow: hidden;
 }
 
+.off {
+  transition: opacity 1s;
+  opacity: 0;
+}
+
+.on {
+  transition: opacity 1s;
+  opacity: 1 !important;
+}
+
 .syncTab {
   pointer-events: all;
   position: absolute;
@@ -36,7 +46,7 @@
 
 .syncTab::after {
   position: absolute;
-  content: "";
+  content: '';
   width: 3rem;
   top: 0;
   transform: translateY(-100%);
@@ -111,8 +121,6 @@
   opacity: 0.2;
 }
 
-
-
 .trash-off {
   opacity: 0;
   transform: translateY(20%);
@@ -140,6 +148,7 @@
   list-style: none;
   margin: 0 !important;
   display: block;
+  opacity: 0;
 }
 
 .item p {
@@ -152,8 +161,29 @@
   border-radius: 1rem;
   padding: 5%;
   cursor: grab;
-  display: block; 
+  display: block;
   position: relative;
+  opacity: 1;
+  /* transition: opacity 1s; */
+}
+
+.added {
+  animation: itemIn 1s;
+}
+
+@keyframes itemIn {
+  0% {
+    /* transform: translateY(100%); */
+    opacity: 0;
+  }
+  100% {
+    /* transform: translateY(0); */
+    opacity: 1;
+  }
+}
+
+.notAdded {
+  opacity: 1 !important;
 }
 
 li {

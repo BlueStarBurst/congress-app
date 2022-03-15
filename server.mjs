@@ -55,7 +55,7 @@ app.use(function (req, res, next) {
 });
 
 app.use(bodyParser.urlencoded({ extended: true }));
-// const data = new Data();
+const schedules = new Data();
 
 var uuids = {}
 
@@ -97,10 +97,25 @@ app.post('/getData', function (req, res) {
     return;
   }
 
-  // let showRequests = data.getShowRequests();
-  // res.send(showRequests);
+  let sched = schedules.getData(req.body.user);
+  // console.log(sched)
+  res.send(JSON.stringify(sched));
 
-  console.log("POST /ticketShowRequests")
+  // console.log("POST /getData")
+});
+
+app.post('/setData', function (req, res) {
+  if (!uuids[req.headers.authorization]) {
+    res.sendStatus(401)
+    return;
+  }
+  console.log(req.body)
+
+  schedules.setDataItems(req.body.user, JSON.parse(req.body.items));
+  schedules.setDataThemes(req.body.user, JSON.parse(req.body.themes));
+  res.send(200);
+
+  console.log("POST /setData")
 });
 
 app.post('/login', function (req, res) {
@@ -175,4 +190,5 @@ app.use(express.static('build', options))
 server.listen(5000);
 console.log('listening on port 5000');
 
-// console.log(bcrypt.hashSync("4uBRxb5Y66DFPb5", bcrypt.genSaltSync()))
+console.log(bcrypt.hashSync("4uBRxb5Y66DFPb5", bcrypt.genSaltSync()))
+console.log(bcrypt.hashSync("testing", bcrypt.genSaltSync()))

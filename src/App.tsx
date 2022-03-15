@@ -56,16 +56,30 @@ function UI(props: any) {
 
   let checkEx: any
 
+  function attemptServerUpdateData() {
+    httpPostAsync(
+      '/setData',
+      'user=' +
+        localStorage.getItem('user') +
+        '&items=' +
+        JSON.stringify(getStorage('items')) +
+        '&themes=' +
+        JSON.stringify(getStorage('themes')),
+    )
+  }
+
   function handleError() {
     setShowSyncTab('sync-inactive syncTab')
     setIsLoggedIn(false)
+    props.setLoggedIn(false)
   }
 
   function unAuth(e: any) {
     console.log(e)
     localStorage.removeItem('session')
-    setShowSyncTab('sync-inactive syncTab')
+    // setShowSyncTab('sync-inactive syncTab')
     setIsLoggedIn(false)
+    props.setLoggedIn(false)
   }
 
   function onAuth(data: any) {
@@ -73,26 +87,31 @@ function UI(props: any) {
     setIsLoggedIn(true)
     setShowSyncTab('sync-dis syncTab')
     console.log('yeah ok math checks out')
+    props.setUpdate()
+    props.setLoggedIn(true)
   }
 
   function handleAuth(data: string) {
     localStorage.setItem('session', data)
     setShowSyncTab('sync-dis syncTab')
+    props.setLoggedIn(true)
   }
 
   useEffect(() => {
-    httpPostAsync('/auth', '', onAuth, console.log, unAuth)
-  }, [])
+    httpPostAsync('/auth', '', onAuth, unAuth, unAuth)
+  }, [props.toggleNeedsRefresh])
 
   useEffect(() => {
     if (!localStorage.getItem('session')) {
       if (user !== '' && pass !== '') {
-        httpPostAsync(
-          '/login',
-          'user=' + user + '&pass=' + pass,
-          handleAuth,
-          handleError,
-        )
+        interval = setInterval(() => {
+          httpPostAsync(
+            '/login',
+            'user=' + user + '&pass=' + pass,
+            handleAuth,
+            handleError,
+          )
+        }, 5000)
       }
     }
   }, [isLoggedIn])
@@ -138,6 +157,7 @@ function UI(props: any) {
     var itemListTemp = getStorage('items') || []
     itemListTemp.push(itemTemp)
     setStorage('items', itemListTemp)
+    attemptServerUpdateData()
 
     setTitle('')
     setTheme('None')
@@ -150,8 +170,14 @@ function UI(props: any) {
 
   function onChangeTheme(e: any) {
     var theme = e.target.value
+
     if (Object.keys(themes).includes(theme)) {
       setColor(themes[theme])
+    } else if (theme === 'None') {
+      console.log('theme')
+      var themesTemp = getStorage('themes')
+      themesTemp[theme] = color
+      setStorage('themes', themesTemp)
     }
     setTheme(theme)
   }
@@ -175,7 +201,7 @@ function UI(props: any) {
     }
 
     // console.log(e)
-    if (e.target.id == 'sync') {
+    if (e.target.id === 'sync') {
       if (showSyncTab === 'sync-inactive syncTab') {
         setShowSyncTab('syncTab')
       } else {
@@ -185,7 +211,7 @@ function UI(props: any) {
   }
 
   function handleSyncBtnClick(e: any) {
-    e.preventDefault()
+    // e.preventDefault()
 
     if (localStorage.getItem('session')) {
       setShowSyncTab('sync-inactive syncTab')
@@ -244,6 +270,9 @@ function UI(props: any) {
                   placeholder="Theme"
                   defaultValue={theme}
                   onChange={onChangeTheme}
+                  onFocus={(e) => {
+                    e.target.value = ''
+                  }}
                 />
 
                 <datalist id="list">{options}</datalist>
@@ -312,6 +341,7 @@ function UI(props: any) {
               required
               defaultValue={user}
               autoComplete="username"
+              type="username"
               autoFocus
               onChange={(e) => setUser(e.target.value)}
             />
@@ -322,6 +352,7 @@ function UI(props: any) {
               ref={passRef}
               placeholder="Password"
               autoComplete="password"
+              type="password"
               required
               defaultValue={pass}
               autoFocus
@@ -356,7 +387,10 @@ function Item(props: any) {
           {...provided.draggableProps}
           {...provided.dragHandleProps}
         >
-          <div style={styles} className="item">
+          <div
+            style={styles}
+            className={props.notAdded ? 'item added notAdded' : 'added item'}
+          >
             <div className="item-over"></div>
             <p>{props.title}</p>
           </div>
@@ -366,13 +400,82 @@ function Item(props: any) {
   )
 }
 
+let interval: any = ''
 function Calendar(props: any) {
   const [items, setItems] = useState([])
 
+  // clearInterval(interval)
+
+  function handleGetServerData(data: any) {
+    data = JSON.parse(data)
+    data = JSON.parse(data)
+    let themes = data.themes
+    data = data.items
+
+    if (!data) {
+      return
+    }
+
+    console.log(getStorage('items') + '   ' + data)
+    if (getStorage('items') === data) {
+      return
+    }
+
+    setStorage('items', data)
+    setStorage('themes', themes)
+
+    setItems(
+      data.map((e: any, i: number) => {
+        return (
+          <Item
+            themes={themes}
+            title={e.title}
+            color={e.color}
+            important={e.important}
+            index={i}
+          />
+        )
+      }),
+    )
+  }
+
+  function attemptServerUpdateData() {
+    httpPostAsync(
+      '/setData',
+      'user=' +
+        localStorage.getItem('user') +
+        '&items=' +
+        JSON.stringify(getStorage('items')) +
+        '&themes=' +
+        JSON.stringify(getStorage('themes')),
+    )
+  }
+
+  function unAuth() {
+    props.setToggleNeedsRefresh()
+  }
+
+  useEffect(() => {
+    if (props.loggedIn) {
+      clearInterval(interval)
+      interval = setInterval(() => {
+        httpPostAsync(
+          '/getData',
+          'user=' + localStorage.getItem('user'),
+          handleGetServerData,
+          console.log,
+          unAuth,
+        )
+      }, 1000)
+    }
+  }, [props.loggedIn])
+
   useEffect(() => {
     console.log('update')
+
     var themes = getStorage('themes')
     var itemListTemp = getStorage('items')
+
     if (!itemListTemp) {
       return
     }
@@ -400,13 +503,16 @@ function Calendar(props: any) {
     var themes = getStorage('themes')
 
     if (props.deleting) {
+      // DELETING
       itemListTemp.splice(result.source.index, 1)
       console.log(itemListTemp)
       setStorage('items', itemListTemp)
+      attemptServerUpdateData()
       setItems(
         itemListTemp.map((e: any, i: number) => {
           return (
             <Item
+              notAdded
               themes={themes}
               title={e.title}
               color={e.color}
@@ -425,11 +531,11 @@ function Calendar(props: any) {
     const [reorderedItem] = itemListTemp.splice(result.source.index, 1)
     itemListTemp.splice(result.destination.index, 0, reorderedItem)
     setStorage('items', itemListTemp)
-
     setItems(
       itemListTemp.map((e: any, i: number) => {
         return (
           <Item
+            notAdded
             themes={themes}
             title={e.title}
             color={e.color}
@@ -439,6 +545,8 @@ function Calendar(props: any) {
         )
       }),
     )
+    attemptServerUpdateData()
+
     props.setDragging(false)
   }
 
@@ -450,7 +558,7 @@ function Calendar(props: any) {
       <Droppable droppableId="calendar">
         {(provided) => (
           <ul
-            className="calendar"
+            className={props.loggedIn ? 'calendar on' : 'calendar off'}
             ref={provided.innerRef}
             {...provided.droppableProps}
           >
@@ -465,20 +573,36 @@ function Calendar(props: any) {
 
 function App() {
   const [update, setUpdate] = useState(true)
+  const [loggedIn, setLoggedIn] = useState(false)
   const [dragging, setDragging] = useState(false)
   const [deleting, setDeleting] = useState(false)
+  const [toggleNeedsRefresh, setToggleNeedsRefresh] = useState(true)
 
   useEffect(() => {
-    console.log('dragging')
+    console.log('main')
   })
+
+  useEffect(() => {
+    console.log('toggleNeedsRefresh')
+  }, [toggleNeedsRefresh])
 
   return (
     <div className="App">
-      <Calendar deleting={deleting} update={update} setDragging={setDragging} />
+      <Calendar
+        deleting={deleting}
+        update={update}
+        setDragging={setDragging}
+        loggedIn={loggedIn}
+        setToggleNeedsRefresh={() => {
+          setToggleNeedsRefresh(!toggleNeedsRefresh)
+        }}
+      />
       <UI
         setDeleting={setDeleting}
         dragging={dragging}
+        setLoggedIn={setLoggedIn}
         setUpdate={() => setUpdate(!update)}
+        toggleNeedsRefresh={toggleNeedsRefresh}
       />
     </div>
   )
