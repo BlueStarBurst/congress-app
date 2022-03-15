@@ -113,7 +113,7 @@ app.post('/setData', function (req, res) {
 
   schedules.setDataItems(req.body.user, JSON.parse(req.body.items));
   schedules.setDataThemes(req.body.user, JSON.parse(req.body.themes));
-  res.send(200);
+  res.sendStatus(200);
 
   console.log("POST /setData")
 });

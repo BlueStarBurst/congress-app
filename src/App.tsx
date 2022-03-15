@@ -218,7 +218,7 @@ function UI(props: any) {
       return
     }
 
-    console.log(user + '  ' + pass)
+    // console.log(user + '  ' + pass)
 
     localStorage.setItem('user', user)
     localStorage.setItem('pass', pass)
@@ -416,7 +416,7 @@ function Calendar(props: any) {
       return
     }
 
-    console.log(getStorage('items') + '   ' + data)
+    // console.log(getStorage('items') + '   ' + data)
     if (getStorage('items') === data) {
       return
     }
