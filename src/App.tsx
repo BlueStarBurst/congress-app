@@ -91,22 +91,32 @@ function UI(props: any) {
     props.setLoggedIn(true)
   }
 
+  let counter = 0
   function handleAuth(data: string) {
     localStorage.setItem('user', user)
     localStorage.setItem('pass', pass)
     localStorage.setItem('session', data)
     setShowSyncTab('sync-dis syncTab')
     props.setLoggedIn(true)
+    counter = 0;
   }
 
-  useEffect(() => {
+  function initFail() {
+    if (counter > 0) {
+      return;
+    }
+    console.log('login')
     httpPostAsync(
       '/login',
       'user=' + user + '&pass=' + pass,
       handleAuth,
       handleError,
     )
-    // httpPostAsync('/auth', '', onAuth, unAuth, unAuth)
+    counter++;
+  }
+
+  useEffect(() => {
+    httpPostAsync('/auth', '', onAuth, console.log, initFail)
   }, [props.toggleNeedsRefresh])
 
   useEffect(() => {
@@ -227,8 +237,6 @@ function UI(props: any) {
     }
 
     // console.log(user + '  ' + pass)
-
-    
 
     httpPostAsync('/login', 'user=' + user + '&pass=' + pass, handleAuth, () =>
       setShowSyncTab('sync-inactive syncTab'),
@@ -448,7 +456,7 @@ function Calendar(props: any) {
 
   function attemptServerUpdateData() {
     if (!props.loggedIn) {
-      return;
+      return
     }
     httpPostAsync(
       '/setData',
