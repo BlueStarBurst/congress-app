@@ -19,7 +19,7 @@
   bottom: 0;
   height: 7.25rem;
   width: 100% !important;
-  margin-bottom: 0rem;
+  margin-bottom: -7.25rem;
   text-align: center;
   display: flex;
   flex-direction: column;
@@ -29,8 +29,20 @@
   transition: all 1s;
 }
 
-.sync-inactive {
-  margin-bottom: -7.25rem !important;
+@keyframes init {
+  0% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.sync-active {
+  margin-bottom: 0rem !important;
   transition: all 1s;
 }
 
@@ -64,6 +76,7 @@
   position: absolute;
   transform: translate(-100%, -100%);
   pointer-events: none;
+  animation: init 2s;
 }
 
 .ui-main {
@@ -77,6 +90,7 @@
   position: absolute;
   transform: translate(-100%, -100%);
   pointer-events: none;
+
 }
 
 .ui-main div {

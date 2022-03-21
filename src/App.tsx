@@ -1,6 +1,6 @@
-import React, { useEffect, useRef, useState } from 'react'
-import logo from './logo.svg'
-import './App.css'
+import React, { useEffect, useRef, useState } from "react";
+import logo from "./logo.svg";
+import "./App.css";
 import {
   Button,
   Form,
@@ -8,96 +8,96 @@ import {
   FormControl,
   InputGroup,
   Modal,
-} from 'react-bootstrap'
+} from "react-bootstrap";
 
-import { TwitterPicker } from 'react-color'
-import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd'
+import { TwitterPicker } from "react-color";
+import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 
 // import 'bootstrap/dist/css/bootstrap.min.css'
-import 'bootstrap-dark-5/dist/css/bootstrap-dark.min.css'
-import { httpPostAsync } from './serverHandler'
-import internal from 'stream'
-import { IntervalHistogram } from 'perf_hooks'
+import "bootstrap-dark-5/dist/css/bootstrap-dark.min.css";
+import { httpPostAsync } from "./serverHandler";
+import internal from "stream";
+import { IntervalHistogram } from "perf_hooks";
 
 // window.location.href = "https://localhost:5000/"
 
 function setStorage(name: string, value: any) {
-  localStorage.setItem(name, JSON.stringify(value))
+  localStorage.setItem(name, JSON.stringify(value));
 }
 
 function getStorage(name: string) {
-  var item = localStorage.getItem(name)
+  var item = localStorage.getItem(name);
   if (item) {
-    return JSON.parse(item)
+    return JSON.parse(item);
   }
-  return null
+  return null;
 }
 
 function UI(props: any) {
-  const [show, setShow] = useState(false)
-  const [title, setTitle] = useState('')
-  const [theme, setTheme] = useState('None')
-  const [color, setColor] = useState('#ABB8C3')
-  const [colorDisplay, setColorDisplay] = useState(true)
-  const [important, setImportant] = useState(false)
+  const [show, setShow] = useState(false);
+  const [title, setTitle] = useState("");
+  const [theme, setTheme] = useState("None");
+  const [color, setColor] = useState("#ABB8C3");
+  const [colorDisplay, setColorDisplay] = useState(true);
+  const [important, setImportant] = useState(false);
 
-  const [themes, setThemes] = useState(getStorage('themes'))
-  const [options, setOptions] = useState([] as any[])
+  const [themes, setThemes] = useState(getStorage("themes"));
+  const [options, setOptions] = useState([] as any[]);
 
-  const colorRef = useRef(null)
-  const titleRef = useRef<any>(null)
+  const colorRef = useRef(null);
+  const titleRef = useRef<any>(null);
 
-  const [showSyncTab, setShowSyncTab] = useState('syncTab')
-  const userRef = useRef(null)
-  const [user, setUser] = useState(localStorage.getItem('user') || '')
-  const passRef = useRef(null)
-  const [pass, setPass] = useState(localStorage.getItem('pass') || '')
-  const [isLoggedIn, setIsLoggedIn] = useState(true)
+  const [showSyncTab, setShowSyncTab] = useState("syncTab");
+  const userRef = useRef(null);
+  const [user, setUser] = useState(localStorage.getItem("user") || "");
+  const passRef = useRef(null);
+  const [pass, setPass] = useState(localStorage.getItem("pass") || "");
+  const [isLoggedIn, setIsLoggedIn] = useState(true);
 
-  let checkEx: any
+  let checkEx: any;
 
   function attemptServerUpdateData() {
     httpPostAsync(
-      '/setData',
-      'user=' +
-        localStorage.getItem('user') +
-        '&items=' +
-        JSON.stringify(getStorage('items')) +
-        '&themes=' +
-        JSON.stringify(getStorage('themes')),
-    )
+      "/setData",
+      "user=" +
+        localStorage.getItem("user") +
+        "&items=" +
+        JSON.stringify(getStorage("items")) +
+        "&themes=" +
+        JSON.stringify(getStorage("themes"))
+    );
   }
 
   function handleError() {
-    setShowSyncTab('sync-inactive syncTab')
-    setIsLoggedIn(false)
-    props.setLoggedIn(false)
+    // setShowSyncTab('sync-inactive syncTab')
+    setIsLoggedIn(false);
+    props.setLoggedIn(false);
   }
 
   function unAuth(e: any) {
-    console.log(e)
-    localStorage.removeItem('session')
+    console.log(e);
+    localStorage.removeItem("session");
     // setShowSyncTab('sync-inactive syncTab')
-    setIsLoggedIn(false)
-    props.setLoggedIn(false)
+    setIsLoggedIn(false);
+    props.setLoggedIn(false);
   }
 
   function onAuth(data: any) {
-    console.log(data)
-    setIsLoggedIn(true)
-    setShowSyncTab('sync-dis syncTab')
-    console.log('yeah ok math checks out')
-    props.setUpdate()
-    props.setLoggedIn(true)
+    console.log(data);
+    setIsLoggedIn(true);
+    setShowSyncTab("sync-dis syncTab");
+    console.log("yeah ok math checks out");
+    props.setUpdate();
+    props.setLoggedIn(true);
   }
 
-  let counter = 0
+  let counter = 0;
   function handleAuth(data: string) {
-    localStorage.setItem('user', user)
-    localStorage.setItem('pass', pass)
-    localStorage.setItem('session', data)
-    setShowSyncTab('sync-dis syncTab')
-    props.setLoggedIn(true)
+    localStorage.setItem("user", user);
+    localStorage.setItem("pass", pass);
+    localStorage.setItem("session", data);
+    setShowSyncTab("sync-dis syncTab");
+    props.setLoggedIn(true);
     counter = 0;
   }
 
@@ -105,142 +105,142 @@ function UI(props: any) {
     if (counter > 0) {
       return;
     }
-    console.log('login')
+    console.log("login");
     httpPostAsync(
-      '/login',
-      'user=' + user + '&pass=' + pass,
+      "/login",
+      "user=" + user + "&pass=" + pass,
       handleAuth,
-      handleError,
-    )
+      handleError
+    );
     counter++;
   }
 
   useEffect(() => {
-    httpPostAsync('/auth', '', onAuth, console.log, initFail)
-  }, [props.toggleNeedsRefresh])
+    httpPostAsync("/auth", "", onAuth, console.log, initFail);
+  }, [props.toggleNeedsRefresh]);
 
   useEffect(() => {
-    if (!localStorage.getItem('session')) {
-      if (localStorage.getItem('user') && localStorage.getItem('user')) {
+    if (!localStorage.getItem("session")) {
+      if (localStorage.getItem("user") && localStorage.getItem("user")) {
         interval = setInterval(() => {
           httpPostAsync(
-            '/login',
-            'user=' + user + '&pass=' + pass,
+            "/login",
+            "user=" + user + "&pass=" + pass,
             handleAuth,
-            handleError,
-          )
-        }, 5000)
+            handleError
+          );
+        }, 5000);
       }
     }
-  }, [isLoggedIn])
+  }, [isLoggedIn]);
 
   useEffect(() => {
     if (titleRef.current) {
-      titleRef.current.focus()
+      titleRef.current.focus();
     }
-    setThemes(getStorage('themes'))
-    var tempOptions: any[] = []
+    setThemes(getStorage("themes"));
+    var tempOptions: any[] = [];
     if (themes) {
       Object.keys(themes).forEach((element) => {
-        tempOptions.push(<option value={element}>{element}</option>)
-      })
+        tempOptions.push(<option value={element}>{element}</option>);
+      });
     } else {
-      setStorage('themes', { None: '#ABB8C3' })
-      tempOptions = [<option value={'None'}>None</option>]
+      setStorage("themes", { None: "#ABB8C3" });
+      tempOptions = [<option value={"None"}>None</option>];
     }
-    setOptions(tempOptions)
-  }, [show])
+    setOptions(tempOptions);
+  }, [show]);
 
   useEffect(() => {
-    props.setDeleting(false)
-  }, [props.dragging])
+    props.setDeleting(false);
+  }, [props.dragging]);
 
   function onSub(e: any) {
-    e.preventDefault()
+    e.preventDefault();
 
-    var itemTemp: any = {}
+    var itemTemp: any = {};
 
-    if (theme.toLowerCase() !== 'none') {
-      var themesTemp = getStorage('themes')
-      themesTemp[theme] = color
-      setStorage('themes', themesTemp)
-      itemTemp['color'] = theme
+    if (theme.toLowerCase() !== "none") {
+      var themesTemp = getStorage("themes");
+      themesTemp[theme] = color;
+      setStorage("themes", themesTemp);
+      itemTemp["color"] = theme;
     } else {
-      itemTemp['color'] = color
+      itemTemp["color"] = color;
     }
 
-    itemTemp['title'] = title
-    itemTemp['important'] = important
+    itemTemp["title"] = title;
+    itemTemp["important"] = important;
 
-    var itemListTemp = getStorage('items') || []
-    itemListTemp.push(itemTemp)
-    setStorage('items', itemListTemp)
-    attemptServerUpdateData()
+    var itemListTemp = getStorage("items") || [];
+    itemListTemp.push(itemTemp);
+    setStorage("items", itemListTemp);
+    attemptServerUpdateData();
 
-    setTitle('')
-    setTheme('None')
-    setColor('#ABB8C3')
-    setImportant(false)
+    setTitle("");
+    setTheme("None");
+    setColor("#ABB8C3");
+    setImportant(false);
 
-    setShow(false)
-    props.setUpdate()
+    setShow(false);
+    props.setUpdate();
   }
 
   function onChangeTheme(e: any) {
-    var theme = e.target.value
+    var theme = e.target.value;
 
     if (Object.keys(themes).includes(theme)) {
-      setColor(themes[theme])
-    } else if (theme === 'None') {
-      console.log('theme')
-      var themesTemp = getStorage('themes')
-      themesTemp[theme] = color
-      setStorage('themes', themesTemp)
+      setColor(themes[theme]);
+    } else if (theme === "None") {
+      console.log("theme");
+      var themesTemp = getStorage("themes");
+      themesTemp[theme] = color;
+      setStorage("themes", themesTemp);
     }
-    setTheme(theme)
+    setTheme(theme);
   }
 
   function deleteDragIn(e: any) {
     if (props.dragging) {
-      props.setDeleting(true)
+      props.setDeleting(true);
     }
   }
 
   function deleteDragOut(e: any) {
     if (props.dragging) {
-      props.setDeleting(false)
+      props.setDeleting(false);
     }
   }
 
   function handleSyncClick(e: any) {
-    if (localStorage.getItem('session')) {
-      setShowSyncTab('sync-dis syncTab')
-      return
+    if (localStorage.getItem("session")) {
+      setShowSyncTab("sync-dis syncTab");
+      return;
     }
 
     // console.log(e)
-    if (e.target.id === 'sync') {
-      if (showSyncTab === 'sync-inactive syncTab') {
-        setShowSyncTab('syncTab')
+    if (e.target.id === "sync") {
+      if (showSyncTab === "syncTab") {
+        setShowSyncTab("syncTab sync-active");
       } else {
-        setShowSyncTab('sync-inactive syncTab')
+        setShowSyncTab("syncTab");
       }
     }
   }
 
   function handleSyncBtnClick(e: any) {
-    e.preventDefault()
+    e.preventDefault();
 
-    if (localStorage.getItem('session')) {
-      setShowSyncTab('sync-inactive syncTab')
-      return
+    if (localStorage.getItem("session")) {
+      setShowSyncTab("syncTab");
+      return;
     }
 
     // console.log(user + '  ' + pass)
 
-    httpPostAsync('/login', 'user=' + user + '&pass=' + pass, handleAuth, () =>
-      setShowSyncTab('sync-inactive syncTab'),
-    )
+    httpPostAsync("/login", "user=" + user + "&pass=" + pass, handleAuth, () =>
+      setShowSyncTab("syncTab sync-active")
+    );
     // setShowSyncTab("sync-dis syncTab")
   }
 
@@ -254,7 +254,7 @@ function UI(props: any) {
         <div
           onMouseEnter={deleteDragIn}
           onMouseLeave={deleteDragOut}
-          className={props.dragging ? 'trash-on' : 'trash-off'}
+          className={props.dragging ? "trash-on" : "trash-off"}
         >
           <img src="./imgs/xWhite.png" />
         </div>
@@ -286,7 +286,7 @@ function UI(props: any) {
                   defaultValue={theme}
                   onChange={onChangeTheme}
                   onFocus={(e) => {
-                    e.target.value = ''
+                    e.target.value = "";
                   }}
                 />
 
@@ -295,7 +295,7 @@ function UI(props: any) {
 
               <InputGroup className="mb-3">
                 <InputGroup.Text
-                  style={{ width: '2.5rem', backgroundColor: color }}
+                  style={{ width: "2.5rem", backgroundColor: color }}
                   id="title"
                 ></InputGroup.Text>
                 <FormControl
@@ -312,16 +312,16 @@ function UI(props: any) {
                   onChangeComplete={(e: any) => setColor(e.hex)}
                   className="mb-3"
                   colors={[
-                    '#FF6900',
-                    '#FCB900',
-                    '#7BDCB5',
-                    '#00D084',
-                    '#8ED1FC',
-                    '#0693E3',
-                    '#ABB8C3',
-                    '#EB144C',
-                    '#F78DA7',
-                    '#9900EF',
+                    "#FF6900",
+                    "#FCB900",
+                    "#7BDCB5",
+                    "#00D084",
+                    "#8ED1FC",
+                    "#0693E3",
+                    "#ABB8C3",
+                    "#EB144C",
+                    "#F78DA7",
+                    "#9900EF",
                   ]}
                   color={color}
                 />
@@ -344,7 +344,7 @@ function UI(props: any) {
       </div>
       <div id="sync" className={showSyncTab} onClick={handleSyncClick}>
         <Form
-          style={{ width: '100%' }}
+          style={{ width: "100%" }}
           onSubmit={handleSyncBtnClick}
           autoComplete="on"
         >
@@ -381,18 +381,18 @@ function UI(props: any) {
         </Form>
       </div>
     </div>
-  )
+  );
 }
 
 function Item(props: any) {
-  var themeColor = props.themes[props.color] || props.color
-  var id = props.index
+  var themeColor = props.themes[props.color] || props.color;
+  var id = props.index;
 
   const styles = {
     color: themeColor,
     borderColor: themeColor,
-    backgroundColor: themeColor + '15',
-  }
+    backgroundColor: themeColor + "15",
+  };
 
   return (
     <Draggable key={props.title} draggableId={props.title} index={id}>
@@ -404,7 +404,7 @@ function Item(props: any) {
         >
           <div
             style={styles}
-            className={props.notAdded ? 'item added notAdded' : 'added item'}
+            className={props.notAdded ? "item added notAdded" : "added item"}
           >
             <div className="item-over"></div>
             <p>{props.title}</p>
@@ -412,32 +412,32 @@ function Item(props: any) {
         </li>
       )}
     </Draggable>
-  )
+  );
 }
 
-let interval: any = ''
+let interval: any = "";
 function Calendar(props: any) {
-  const [items, setItems] = useState([])
+  const [items, setItems] = useState([]);
 
   // clearInterval(interval)
 
   function handleGetServerData(data: any) {
-    data = JSON.parse(data)
-    data = JSON.parse(data)
-    let themes = data.themes
-    data = data.items
+    data = JSON.parse(data);
+    data = JSON.parse(data);
+    let themes = data.themes;
+    data = data.items;
 
     if (!data) {
-      return
+      return;
     }
 
     // console.log(getStorage('items') + '   ' + data)
-    if (getStorage('items') === data) {
-      return
+    if (getStorage("items") === data) {
+      return;
     }
 
-    setStorage('items', data)
-    setStorage('themes', themes)
+    setStorage("items", data);
+    setStorage("themes", themes);
 
     setItems(
       data.map((e: any, i: number) => {
@@ -449,53 +449,53 @@ function Calendar(props: any) {
             important={e.important}
             index={i}
           />
-        )
-      }),
-    )
+        );
+      })
+    );
   }
 
   function attemptServerUpdateData() {
     if (!props.loggedIn) {
-      return
+      return;
     }
     httpPostAsync(
-      '/setData',
-      'user=' +
-        localStorage.getItem('user') +
-        '&items=' +
-        JSON.stringify(getStorage('items')) +
-        '&themes=' +
-        JSON.stringify(getStorage('themes')),
-    )
+      "/setData",
+      "user=" +
+        localStorage.getItem("user") +
+        "&items=" +
+        JSON.stringify(getStorage("items")) +
+        "&themes=" +
+        JSON.stringify(getStorage("themes"))
+    );
   }
 
   function unAuth() {
-    props.setToggleNeedsRefresh()
+    props.setToggleNeedsRefresh();
   }
 
   useEffect(() => {
     if (props.loggedIn) {
-      clearInterval(interval)
+      clearInterval(interval);
       interval = setInterval(() => {
         httpPostAsync(
-          '/getData',
-          'user=' + localStorage.getItem('user'),
+          "/getData",
+          "user=" + localStorage.getItem("user"),
           handleGetServerData,
           console.log,
-          unAuth,
-        )
-      }, 1000)
+          unAuth
+        );
+      }, 1000);
     }
-  }, [props.loggedIn])
+  }, [props.loggedIn]);
 
   useEffect(() => {
-    console.log('update')
+    console.log("update");
 
-    var themes = getStorage('themes')
-    var itemListTemp = getStorage('items')
+    var themes = getStorage("themes");
+    var itemListTemp = getStorage("items");
 
     if (!itemListTemp) {
-      return
+      return;
     }
     setItems(
       itemListTemp.map((e: any, i: number) => {
@@ -507,25 +507,25 @@ function Calendar(props: any) {
             important={e.important}
             index={i}
           />
-        )
-      }),
-    )
-  }, [props.update])
+        );
+      })
+    );
+  }, [props.update]);
 
   function dragEnd(result: any) {
-    console.log(result)
+    console.log(result);
 
-    if (!result.destination) return
+    if (!result.destination) return;
 
-    var itemListTemp = getStorage('items')
-    var themes = getStorage('themes')
+    var itemListTemp = getStorage("items");
+    var themes = getStorage("themes");
 
     if (props.deleting) {
       // DELETING
-      itemListTemp.splice(result.source.index, 1)
-      console.log(itemListTemp)
-      setStorage('items', itemListTemp)
-      attemptServerUpdateData()
+      itemListTemp.splice(result.source.index, 1);
+      console.log(itemListTemp);
+      setStorage("items", itemListTemp);
+      attemptServerUpdateData();
       setItems(
         itemListTemp.map((e: any, i: number) => {
           return (
@@ -537,18 +537,18 @@ function Calendar(props: any) {
               important={e.important}
               index={i}
             />
-          )
-        }),
-      )
-      props.setDragging(false)
-      return
+          );
+        })
+      );
+      props.setDragging(false);
+      return;
     }
 
-    console.log(result)
+    console.log(result);
 
-    const [reorderedItem] = itemListTemp.splice(result.source.index, 1)
-    itemListTemp.splice(result.destination.index, 0, reorderedItem)
-    setStorage('items', itemListTemp)
+    const [reorderedItem] = itemListTemp.splice(result.source.index, 1);
+    itemListTemp.splice(result.destination.index, 0, reorderedItem);
+    setStorage("items", itemListTemp);
     setItems(
       itemListTemp.map((e: any, i: number) => {
         return (
@@ -560,12 +560,12 @@ function Calendar(props: any) {
             important={e.important}
             index={i}
           />
-        )
-      }),
-    )
-    attemptServerUpdateData()
+        );
+      })
+    );
+    attemptServerUpdateData();
 
-    props.setDragging(false)
+    props.setDragging(false);
   }
 
   return (
@@ -576,7 +576,7 @@ function Calendar(props: any) {
       <Droppable droppableId="calendar">
         {(provided) => (
           <ul
-            className={props.loggedIn ? 'calendar on' : 'calendar off'}
+            className={props.loggedIn ? "calendar on" : "calendar off"}
             ref={provided.innerRef}
             {...provided.droppableProps}
           >
@@ -586,33 +586,37 @@ function Calendar(props: any) {
         )}
       </Droppable>
     </DragDropContext>
-  )
+  );
 }
 
 function App() {
-  const [update, setUpdate] = useState(true)
-  const [loggedIn, setLoggedIn] = useState(false)
-  const [dragging, setDragging] = useState(false)
-  const [deleting, setDeleting] = useState(false)
-  const [toggleNeedsRefresh, setToggleNeedsRefresh] = useState(true)
+  const [update, setUpdate] = useState(true);
+  const [loggedIn, setLoggedIn] = useState(false);
+  const [dragging, setDragging] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [toggleNeedsRefresh, setToggleNeedsRefresh] = useState(true);
+  const container = useRef<any>(null);
 
   useEffect(() => {
-    console.log('main')
-  })
+    console.log("main");
+    if (container.current) {
+      console.log(container.current.scrollTo(0,0));
+    }
+  });
 
   useEffect(() => {
-    console.log('toggleNeedsRefresh')
-  }, [toggleNeedsRefresh])
+    console.log("toggleNeedsRefresh");
+  }, [toggleNeedsRefresh]);
 
   return (
-    <div className="App">
+    <div className="App" ref={container}>
       <Calendar
         deleting={deleting}
         update={update}
         setDragging={setDragging}
         loggedIn={loggedIn}
         setToggleNeedsRefresh={() => {
-          setToggleNeedsRefresh(!toggleNeedsRefresh)
+          setToggleNeedsRefresh(!toggleNeedsRefresh);
         }}
       />
       <UI
@@ -623,7 +627,7 @@ function App() {
         toggleNeedsRefresh={toggleNeedsRefresh}
       />
     </div>
-  )
+  );
 }
 
-export default App
+export default App;

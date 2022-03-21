@@ -27,9 +27,8 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "ext": "webpack --mode development --config ./webpack.ext.config.cjs --watch",
-    "temp": "react-scripts start",
     "build": "react-scripts build",
+    "ext": "webpack --mode development --config ./webpack.ext.config.cjs --watch",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "server": "node server.mjs"
