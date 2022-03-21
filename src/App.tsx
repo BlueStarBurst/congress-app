@@ -375,9 +375,14 @@ function UI(props: any) {
             />
           </InputGroup>
 
-          <Button type="submit" className="w-100">
-            Submit
-          </Button>
+          <div style={{display: "flex"}}>
+          <Button style={{width: "50%"}} type="submit" className="w-50" variant="secondary">
+              Create User
+            </Button>
+            <Button style={{width: "50%"}} type="submit" className="w-50">
+              Submit
+            </Button>
+          </div>
         </Form>
       </div>
     </div>
@@ -600,7 +605,7 @@ function App() {
   useEffect(() => {
     console.log("main");
     if (container.current) {
-      console.log(container.current.scrollTo(0,0));
+      console.log(container.current.scrollTo(0, 0));
     }
   });
 

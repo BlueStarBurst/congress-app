@@ -29,6 +29,10 @@
   transition: all 1s;
 }
 
+.anchor:hover {
+  cursor: pointer;
+}
+
 @keyframes init {
   0% {
     opacity: 0;
