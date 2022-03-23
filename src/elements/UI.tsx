@@ -44,7 +44,7 @@ export default function UI(props: any) {
         "&items=" +
         JSON.stringify(getStorage("items")) +
         "&themes=" +
-        JSON.stringify(getStorage("themes"))
+        JSON.stringify(getStorage("themes")), console.log, console.log, unAuth
     );
   }
 
@@ -54,13 +54,13 @@ export default function UI(props: any) {
     props.setLoggedIn(false);
   }
 
-  //   function unAuth(e: any) {
-  //     console.log(e);
-  //     localStorage.removeItem("session");
-  //     // setShowSyncTab('sync-inactive syncTab')
-  //     setIsLoggedIn(false);
-  //     props.setLoggedIn(false);
-  //   }
+  function unAuth(e: any) {
+    console.log(e);
+    localStorage.removeItem("session");
+    // setShowSyncTab('sync-inactive syncTab')
+    setIsLoggedIn(false);
+    props.setLoggedIn(false);
+  }
 
   function onAuth(data: any) {
     console.log(data);

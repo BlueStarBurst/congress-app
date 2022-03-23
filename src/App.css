@@ -184,6 +184,15 @@
   /* transition: opacity 1s; */
 }
 
+.item-important {
+  border-width: 2px !important;
+}
+
+.item-important p {
+  margin: 0;
+  font-weight: 500;
+}
+
 .added {
   animation: itemIn 1s;
 }

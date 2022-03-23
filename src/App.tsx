@@ -34,6 +34,7 @@ function App() {
         deleting={deleting}
         update={update}
         setDragging={setDragging}
+        setUpdate={() => setUpdate(!update)}
         loggedIn={loggedIn}
         setToggleNeedsRefresh={() => {
           setToggleNeedsRefresh(!toggleNeedsRefresh);
