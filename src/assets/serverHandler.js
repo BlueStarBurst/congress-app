@@ -7,13 +7,13 @@ export function httpPostAsync(theUrl, data, callback = console.log, error = cons
     xmlHttp.setRequestHeader('Authorization', localStorage.getItem("session"));
 
     xmlHttp.onreadystatechange = function () {
-        if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
+        if (xmlHttp.readyState === 4 && xmlHttp.status === 200) {
             callback(xmlHttp.responseText);
         }
-        else if (xmlHttp.status == 401 && unAuth) {
+        else if (xmlHttp.status === 401 && unAuth) {
             unAuth(xmlHttp.status)
         }
-        else if (xmlHttp.status != 200) {
+        else if (xmlHttp.status !== 200) {
             // console.log(xmlHttp.readyState);
             // console.log(xmlHttp.status);
             error(xmlHttp.status)
