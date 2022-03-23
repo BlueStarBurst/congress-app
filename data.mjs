@@ -29,7 +29,7 @@ export default class Data {
 
     saveData() {
         var jsonS = JSON.stringify(this.data);
-        fs.writeFileSync('secure/data.json', jsonS, (err) => {
+        fs.writeFile('secure/data.json', jsonS, (err) => {
             if (err) throw err;
             console.log('The data has been saved!');
         });

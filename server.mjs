@@ -3,8 +3,8 @@ import bodyParser from 'body-parser';
 import Data from './data.mjs';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
-import bcrypt from 'bcrypt'
-import { readFileSync, readFile } from 'fs';
+import bcrypt from 'bcryptjs'
+import { readFileSync, readFile, writeFile, writeFileSync } from 'fs';
 import { Server } from 'http'
 import { Server as HttpsServer } from 'https'
 
@@ -113,12 +113,15 @@ app.post('/auth', function (req, res) {
 });
 
 app.post('/getData', function (req, res) {
+
   if (!uuids[req.headers.authorization]) {
     res.sendStatus(401)
     return;
   }
 
-  let sched = schedules.getData(req.body.user);
+  let user = uuids[req.headers.authorization];
+
+  let sched = schedules.getData(user);
   // console.log(sched)
   res.send(JSON.stringify(sched));
 
@@ -132,8 +135,10 @@ app.post('/setData', function (req, res) {
   }
   console.log(req.body)
 
-  schedules.setDataItems(req.body.user, JSON.parse(req.body.items));
-  schedules.setDataThemes(req.body.user, JSON.parse(req.body.themes));
+  let user = uuids[req.headers.authorization];
+
+  schedules.setDataItems(user, JSON.parse(req.body.items));
+  schedules.setDataThemes(user, JSON.parse(req.body.themes));
   res.sendStatus(200);
 
   console.log("POST /setData")
@@ -142,64 +147,46 @@ app.post('/setData', function (req, res) {
 app.post('/login', function (req, res) {
   // res.sendFile(__dirname + '/dist/index.html');
 
-  bcrypt.compare(req.body.pass, users.hash, function (err, result) {
-    console.log("POST /login")
-    console.log(req.body)
-    if (result && req.body.user == users.user) {
-      var genuuid = uuidv4();
-      uuids[genuuid] = res;
-      console.log(genuuid);
-      console.log(Object.keys(uuids));
-
-      // if (!req.body.time) {
-      //   res.send(genuuid)
-      //   return;
-      // }
-
-      setTimeout(() => {
-        console.log("session " + genuuid + " has expired!")
-        delete uuids[genuuid];
-        console.log(Object.keys(uuids))
-      }, 300000);
-      res.send(genuuid)
-    } else {
-      res.sendStatus(400);
-    }
-  });
-
-});
-
-app.post('/autofill', function (req, res) {
-  // console.log('Got body:', req.body);
-  var name = "";
-  if (req.body.str) {
-    name = req.body.str;
-  }
-  // res.send(data.getShowNames(name));
-});
-
-app.post('/createShowRequest', function (req, res) {
-  // console.log('Got body:', req.body);
-  // let save = data.createShowTicket(req.body);
-  // if (save) {
-  //     res.sendStatus(200);
-  // } else {
-  //     res.sendStatus(409);
-  // }
-});
-
-app.post('/approveShow', function (req, res) {
-  if (!uuids[req.headers.authorization]) {
-    res.sendStatus(401)
+  if (!users[req.body.user]) {
+    res.sendStatus(400);
     return;
   }
 
-  // let save = data.approveShow(req.body);
-  // if (save) {
-  //     res.sendStatus(200);
-  // } else {
-  //     res.sendStatus(409);
-  // }
+  if (users[req.body.user].hash === req.body.pass) {
+    var genuuid = uuidv4();
+    uuids[genuuid] = req.body.user;
+    console.log(genuuid);
+    console.log(Object.keys(uuids));
+
+    setTimeout(() => {
+      console.log("session " + genuuid + " has expired!")
+      delete uuids[genuuid];
+      console.log(Object.keys(uuids))
+    }, 300000);
+    res.send(genuuid)
+    return;
+  } else {
+    res.sendStatus(400);
+  }
+});
+
+app.post('/signup', function (req, res) {
+  if (users[req.body.user]) {
+    res.sendStatus(400);
+    return;
+  }
+
+  let newUser = { "hash": req.body.pass }
+  users[req.body.user] = newUser;
+
+  console.log("POST /signup")
+  res.sendStatus(200);
+
+  var jsonS = JSON.stringify(users);
+  writeFile('secure/users.json', jsonS, (err) => {
+    if (err) throw err;
+    console.log('The data has been saved!');
+  });
 });
 
 app.use(express.static('build', options))

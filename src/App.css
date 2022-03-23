@@ -33,6 +33,10 @@
   cursor: pointer;
 }
 
+.inputText {
+  width: 5rem;
+}
+
 @keyframes init {
   0% {
     opacity: 0;
