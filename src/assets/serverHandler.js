@@ -31,7 +31,7 @@ export function httpGetAsync(theUrl, data, callback = console.log) {
     xmlHttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
 
     xmlHttp.onreadystatechange = function () {
-        if (xmlHttp.readyState == 4 && xmlHttp.status == 200)
+        if (xmlHttp.readyState === 4 && xmlHttp.status === 200)
             callback(xmlHttp.responseText);
     }
 
