@@ -12,9 +12,31 @@ import React, { useEffect, useRef, useState } from "react";
 import { getStorage, setStorage } from "../assets/storageHandler";
 import { b64_sha256 } from "../assets/hash";
 
+// import AdapterDateFns from "@mui/lab/AdapterDateFns";
+// import type LocalizationProvider from "@mui/lab/LocalizationProvider";
+// import { DatePicker, LocalizationProvider } from "@mui/lab";
+// import { TextField } from "@mui/material";
+
+// import AdapterDateFns from "@material-ui/pickers/DatePicker"
+
+import Stack from "@mui/material/Stack";
+import TextField from "@mui/material/TextField";
+import AdapterDateFns from "@mui/lab/AdapterDateFns";
+import LocalizationProvider from "@mui/lab/LocalizationProvider";
+import TimePicker from "@mui/lab/TimePicker";
+import DateTimePicker from "@mui/lab/DateTimePicker";
+import DesktopDatePicker from "@mui/lab/DesktopDatePicker";
+import MobileDatePicker from "@mui/lab/MobileDatePicker";
+
 let interval: any = "";
 
 export default function UI(props: any) {
+  const [date, setDate] = React.useState<Date | null>(new Date());
+
+  const handleChange = (newValue: Date | null) => {
+    setDate(newValue);
+  };
+
   const [show, setShow] = useState(false);
   const [title, setTitle] = useState("");
   const [theme, setTheme] = useState("None");
@@ -44,7 +66,10 @@ export default function UI(props: any) {
         "&items=" +
         JSON.stringify(getStorage("items")) +
         "&themes=" +
-        JSON.stringify(getStorage("themes")), console.log, console.log, unAuth
+        JSON.stringify(getStorage("themes")),
+      console.log,
+      console.log,
+      unAuth
     );
   }
 
@@ -151,6 +176,7 @@ export default function UI(props: any) {
 
     itemTemp["title"] = title;
     itemTemp["important"] = important;
+    itemTemp["date"] = date;
 
     var itemListTemp = getStorage("items") || [];
     itemListTemp.push(itemTemp);
@@ -289,8 +315,22 @@ export default function UI(props: any) {
                   onChange={(e) => setTitle(e.target.value)}
                 />
               </InputGroup>
+              <Stack>
+                <LocalizationProvider
+                  dateAdapter={AdapterDateFns}
+                  className="mb-3"
+                >
+                  <DesktopDatePicker
+                    label="Date"
+                    inputFormat="MM/dd/yyyy"
+                    value={date}
+                    onChange={handleChange}
+                    renderInput={(params) => <TextField {...params} />}
+                  />
+                </LocalizationProvider>
+              </Stack>
 
-              <InputGroup className="mb-3">
+              <InputGroup className="mb-3 mt-3">
                 <InputGroup.Text id="title">Theme</InputGroup.Text>
                 <FormControl
                   required

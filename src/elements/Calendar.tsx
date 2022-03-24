@@ -13,9 +13,24 @@ import { DragDropContext, Droppable } from "react-beautiful-dnd";
 import Item from "./Item";
 import { TwitterPicker } from "react-color";
 
+import Stack from "@mui/material/Stack";
+import TextField from "@mui/material/TextField";
+import AdapterDateFns from "@mui/lab/AdapterDateFns";
+import LocalizationProvider from "@mui/lab/LocalizationProvider";
+import TimePicker from "@mui/lab/TimePicker";
+import DateTimePicker from "@mui/lab/DateTimePicker";
+import DesktopDatePicker from "@mui/lab/DesktopDatePicker";
+import MobileDatePicker from "@mui/lab/MobileDatePicker";
+
 let interval: any = "";
 
 export default function Calendar(props: any) {
+  const [date, setDate] = React.useState<Date | null>(new Date());
+
+  const handleChange = (newValue: Date | null) => {
+    setDate(newValue);
+  };
+
   const [items, setItems] = useState([]);
   const [showModal, setShowModal] = useState(false);
 
@@ -41,12 +56,14 @@ export default function Calendar(props: any) {
             themes={themes}
             title={e.title}
             color={e.color}
+            date={e.date || null}
             important={e.important}
             index={i}
             setShowModal={setShowModal}
             setTitle={setTitle}
             setTheme={setTheme}
             setColor={setColor}
+            setDate={setDate}
             setImportant={setImportant}
             setCurrentIndex={setCurrentIndex}
           />
@@ -92,7 +109,7 @@ export default function Calendar(props: any) {
   }
 
   function unAuth() {
-    console.log("IHIADSH")
+    console.log("IHIADSH");
     props.setToggleNeedsRefresh();
   }
 
@@ -189,6 +206,7 @@ export default function Calendar(props: any) {
     }
 
     itemTemp["title"] = title;
+    itemTemp["date"] = date;
     itemTemp["important"] = important;
 
     var itemListTemp = getStorage("items") || [];
@@ -253,7 +271,22 @@ export default function Calendar(props: any) {
               />
             </InputGroup>
 
-            <InputGroup className="mb-3">
+            <Stack>
+              <LocalizationProvider
+                dateAdapter={AdapterDateFns}
+                className="mb-3"
+              >
+                <DesktopDatePicker
+                  label="Date"
+                  inputFormat="MM/dd/yyyy"
+                  value={date}
+                  onChange={handleChange}
+                  renderInput={(params) => <TextField {...params} />}
+                />
+              </LocalizationProvider>
+            </Stack>
+
+            <InputGroup className="mb-3 mt-3">
               <InputGroup.Text id="title">Theme</InputGroup.Text>
               <FormControl
                 required

@@ -1,14 +1,17 @@
+import { useRef } from "react";
 import { Draggable } from "react-beautiful-dnd";
 
 export default function Item(props: any) {
   let themeColor = props.themes[props.color] || props.color;
   let id = props.index;
-  let importantClass = (props.important) ? "item-important" : "";
+  let importantClass = props.important ? "item-important" : "";
+
+  const dateRef = useRef<any>(null);
 
   const styles = {
     color: themeColor,
     borderColor: themeColor,
-    backgroundColor: (props.important) ? themeColor + "25" : themeColor + "15",
+    backgroundColor: props.important ? themeColor + "25" : themeColor + "15",
   };
 
   function onEditClick(e: any) {
@@ -19,7 +22,22 @@ export default function Item(props: any) {
     props.setColor(themeColor);
     props.setImportant(props.important);
     props.setCurrentIndex(props.index);
-    props.setShowModal(true)
+    props.setDate(props.date);
+    props.setShowModal(true);
+  }
+
+  function onHoverEnter(e: any) {
+    if (!dateRef.current) {
+      return;
+    }
+    dateRef.current.className = "item-date expanded";
+  }
+
+  function onHoverLeave(e: any) {
+    if (!dateRef.current) {
+      return;
+    }
+    dateRef.current.className = "item-date";
   }
 
   return (
@@ -32,10 +50,23 @@ export default function Item(props: any) {
         >
           <div
             style={styles}
-            className={props.notAdded ? "item added notAdded " + importantClass : "added item " + importantClass}
+            onMouseEnter={onHoverEnter}
+            onMouseLeave={onHoverLeave}
+            className={
+              props.notAdded
+                ? "item added notAdded " + importantClass
+                : "item added " + importantClass
+            }
           >
             <div onClick={onEditClick} className="item-over"></div>
-            <p>{props.title}</p>
+            <div className="item-col">
+              <p>{props.title}</p>
+              {(props.date && typeof props.date === "string" ) ? (
+                <p ref={dateRef} className="item-date">
+                  {new Date(props.date).toDateString()}
+                </p>
+              ) : null}
+            </div>
           </div>
         </li>
       )}
