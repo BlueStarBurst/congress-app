@@ -34,6 +34,8 @@ export default function Calendar(props: any) {
   const [items, setItems] = useState([]);
   const [showModal, setShowModal] = useState(false);
 
+  const [clientUpdatingData, setClientUpdatingData] = useState(false);
+
   const [title, setTitle] = useState("");
   const [theme, setTheme] = useState("None");
   const [color, setColor] = useState("#ABB8C3");
@@ -82,8 +84,15 @@ export default function Calendar(props: any) {
       return;
     }
 
-    // console.log(getStorage('items') + '   ' + data)
     if (getStorage("items") === data) {
+      if (clientUpdatingData) {
+        console.log("updated server");
+        setClientUpdatingData(false);
+      }
+      return;
+    }
+
+    if (clientUpdatingData) {
       return;
     }
 
@@ -97,6 +106,7 @@ export default function Calendar(props: any) {
     if (!props.loggedIn) {
       return;
     }
+    setClientUpdatingData(true);
     httpPostAsync(
       "/setData",
       "user=" +
@@ -109,7 +119,7 @@ export default function Calendar(props: any) {
   }
 
   function unAuth() {
-    console.log("IHIADSH");
+    console.log("unauth")
     props.setToggleNeedsRefresh();
   }
 
@@ -129,7 +139,6 @@ export default function Calendar(props: any) {
   }, [props.loggedIn]);
 
   useEffect(() => {
-    console.log("update");
 
     var themes = getStorage("themes");
     var itemListTemp = getStorage("items");

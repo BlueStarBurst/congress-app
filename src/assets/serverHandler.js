@@ -14,8 +14,6 @@ export function httpPostAsync(theUrl, data, callback = console.log, error = cons
             unAuth(xmlHttp.status)
         }
         else if (xmlHttp.status !== 200) {
-            // console.log(xmlHttp.readyState);
-            // console.log(xmlHttp.status);
             error(xmlHttp.status)
         }
     }

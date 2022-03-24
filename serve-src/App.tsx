@@ -61,9 +61,9 @@ function UI(props: any) {
   }
 
   function onAuth(data: any) {
-    console.log(data)
+    data)
     setShowSyncTab('sync-dis syncTab')
-    console.log('yeah ok math checks out')
+    'yeah ok math checks out')
   }
 
   useEffect(() => {
@@ -155,7 +155,7 @@ function UI(props: any) {
       return
     }
 
-    // console.log(e)
+    // e)
     if (e.target.id == 'sync') {
       if (showSyncTab === 'sync-inactive syncTab') {
         setShowSyncTab('syncTab')
@@ -181,7 +181,7 @@ function UI(props: any) {
       return
     }
 
-    console.log(user + '  ' + pass)
+    user + '  ' + pass)
     httpPostAsync(
       '/login',
       'user=' + user + '&pass=' + pass + '&time=' + 10000,
@@ -358,7 +358,7 @@ function Calendar(props: any) {
   const [items, setItems] = useState([])
 
   useEffect(() => {
-    console.log('update')
+    'update')
     var themes = getStorage('themes')
     var itemListTemp = getStorage('items')
     if (!itemListTemp) {
@@ -380,7 +380,7 @@ function Calendar(props: any) {
   }, [props.update])
 
   function dragEnd(result: any) {
-    console.log(result)
+    result)
 
     if (!result.destination) return
 
@@ -389,7 +389,7 @@ function Calendar(props: any) {
 
     if (props.deleting) {
       itemListTemp.splice(result.source.index, 1)
-      console.log(itemListTemp)
+      itemListTemp)
       setStorage('items', itemListTemp)
       setItems(
         itemListTemp.map((e: any, i: number) => {
@@ -408,7 +408,7 @@ function Calendar(props: any) {
       return
     }
 
-    console.log(result)
+    result)
 
     const [reorderedItem] = itemListTemp.splice(result.source.index, 1)
     itemListTemp.splice(result.destination.index, 0, reorderedItem)
@@ -457,7 +457,7 @@ function App() {
   const [deleting, setDeleting] = useState(false)
 
   useEffect(() => {
-    console.log('dragging')
+    'dragging')
   })
 
   return (

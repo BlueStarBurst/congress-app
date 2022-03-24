@@ -61,7 +61,7 @@
 
 .syncTab::after {
   position: absolute;
-  content: '';
+  content: "";
   width: 3rem;
   top: 0;
   transform: translateY(-100%);
@@ -98,7 +98,6 @@
   position: absolute;
   transform: translate(-100%, -100%);
   pointer-events: none;
-
 }
 
 .ui-main div {
@@ -165,6 +164,8 @@
   list-style: none;
   margin: 0 !important;
   display: block;
+
+  animation: itemIn 1s;
   /* opacity: 0; */
 }
 
@@ -186,23 +187,32 @@
   transition: all 1s;
 }
 
+.itemIn {
+  animation: itemIn 1s;
+}
+
 .item-date {
   height: 0rem;
   opacity: 0;
   transform: translateY(-1.5rem);
   /* padding-bottom: 1.5rem; */
   transition: all 1s;
+  font-weight: lighter;
+  font-size: 85%;
+  
 }
+
 
 .expanded {
   opacity: 1;
-  height: 1.5rem;
+  height: 1.25rem;
   transition: all 1s;
   transform: translateY(0);
+  margin-top: 0.25rem !important;
 }
 
 .item-important {
-  border-width: 2px !important;
+  border-width: 3px !important;
 }
 
 .item-important p {
@@ -227,6 +237,18 @@
 
 .notAdded {
   opacity: 1 !important;
+  animation: alwaysIn 1s !important;
+}
+
+@keyframes alwaysIn {
+  0% {
+    /* transform: translateY(100%); */
+    opacity: 1;
+  }
+  100% {
+    /* transform: translateY(0); */
+    opacity: 1;
+  }
 }
 
 li {
@@ -275,7 +297,7 @@ li {
 .item-over:after {
   align-self: center;
   margin: auto;
-  content: '\2807';
+  content: "\2807";
   font-size: 25px;
 }
 

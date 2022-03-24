@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import { Draggable } from "react-beautiful-dnd";
 
 export default function Item(props: any) {
@@ -11,8 +11,12 @@ export default function Item(props: any) {
   const styles = {
     color: themeColor,
     borderColor: themeColor,
-    backgroundColor: props.important ? themeColor + "25" : themeColor + "15",
+    backgroundColor: props.important ? themeColor + "50" : themeColor + "15",
   };
+
+  // useEffect(()=> {
+  //   console.log("sdkfj");
+  // },[props.index])
 
   function onEditClick(e: any) {
     props.setTitle(props.title);
@@ -47,6 +51,7 @@ export default function Item(props: any) {
           ref={provided.innerRef}
           {...provided.draggableProps}
           {...provided.dragHandleProps}
+          className={"itemIn"}
         >
           <div
             style={styles}
@@ -54,8 +59,8 @@ export default function Item(props: any) {
             onMouseLeave={onHoverLeave}
             className={
               props.notAdded
-                ? "item added notAdded " + importantClass
-                : "item added " + importantClass
+                ? "item " + importantClass
+                : "item " + importantClass
             }
           >
             <div onClick={onEditClick} className="item-over"></div>

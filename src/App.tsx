@@ -18,9 +18,8 @@ function App() {
   const container = useRef<any>(null);
 
   useEffect(() => {
-    console.log("main");
     if (container.current) {
-      console.log(container.current.scrollTo(0, 0));
+      container.current.scrollTo(0, 0);
     }
   });
 
