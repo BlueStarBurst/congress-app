@@ -74,7 +74,9 @@ export default function Calendar(props: any) {
     );
   }
 
+  let counter = 0;
   function handleGetServerData(data: any) {
+    counter = 0;
     data = JSON.parse(data);
     data = JSON.parse(data);
     let themes = data.themes;
@@ -119,8 +121,11 @@ export default function Calendar(props: any) {
   }
 
   function unAuth() {
-    console.log("unauth")
-    props.setToggleNeedsRefresh();
+    if (counter === 0) {
+      console.log("unauth");
+      props.setToggleNeedsRefresh();
+      counter++;
+    }
   }
 
   useEffect(() => {
@@ -139,7 +144,6 @@ export default function Calendar(props: any) {
   }, [props.loggedIn]);
 
   useEffect(() => {
-
     var themes = getStorage("themes");
     var itemListTemp = getStorage("items");
 
