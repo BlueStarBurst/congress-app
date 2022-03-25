@@ -36,7 +36,6 @@ function App() {
         setUpdate={() => setUpdate(!update)}
         loggedIn={loggedIn}
         setToggleNeedsRefresh={() => {
-          console.log("ah")
           setToggleNeedsRefresh(!toggleNeedsRefresh);
         }}
       />
