@@ -6,10 +6,16 @@ export default function Item(props: any) {
   let id = props.id;
   let importantClass = props.important ? "item-important" : "";
 
-  let daysLeft: any =
+  var now: any = new Date();
+  var end: any = new Date(props.date);
+  var diff: any =
+    end - now + (now.getTimezoneOffset() - end.getTimezoneOffset()) * 60 * 1000;
+  var oneDay: any = 1000 * 60 * 60 * 24;
+  var daysLeft: any =
     props.date && typeof props.date === "string"
-      ? new Date(props.date).getUTCDay() - new Date().getUTCDay()
+      ? Math.floor(diff / oneDay) + 1
       : null;
+
   switch (daysLeft) {
     case null:
       break;
@@ -88,7 +94,9 @@ export default function Item(props: any) {
             <div className="item-col">
               <div className="item-head">
                 <p>{props.title}</p>
-                {daysLeft ? <p className="item-head-small">{daysLeft}</p> : null}
+                {daysLeft ? (
+                  <p className="item-head-small">{daysLeft}</p>
+                ) : null}
               </div>
 
               {props.date && typeof props.date === "string" ? (
