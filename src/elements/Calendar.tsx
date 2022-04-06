@@ -25,6 +25,7 @@ import MobileDatePicker from "@mui/lab/MobileDatePicker";
 let interval: any = "";
 
 export default function Calendar(props: any) {
+
   const [date, setDate] = React.useState<Date | null>(new Date());
 
   const handleChange = (newValue: Date | null) => {
@@ -61,6 +62,8 @@ export default function Calendar(props: any) {
             date={e.date || null}
             important={e.important}
             index={i}
+            key={i}
+            id={i + ""}
             setShowModal={setShowModal}
             setTitle={setTitle}
             setTheme={setTheme}
@@ -73,6 +76,7 @@ export default function Calendar(props: any) {
       })
     );
   }
+
 
   let counter = 0;
   function handleGetServerData(data: any) {
@@ -136,7 +140,7 @@ export default function Calendar(props: any) {
           "/getData",
           "user=" + localStorage.getItem("user"),
           handleGetServerData,
-          console.log,
+          unAuth,
           unAuth
         );
       }, 1000);
@@ -171,7 +175,7 @@ export default function Calendar(props: any) {
   }, [showModal]);
 
   function dragEnd(result: any) {
-    console.log(result);
+    // console.log(result);
 
     if (!result.destination) return;
 

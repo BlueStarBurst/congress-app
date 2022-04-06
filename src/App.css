@@ -182,7 +182,7 @@
   display: flex;
   align-items: center;
   position: relative;
-  height: 100%;
+  height: auto;
   opacity: 1;
   transition: all 1s;
 }
@@ -218,6 +218,23 @@
 .item-important p {
   margin: 0;
   font-weight: 500;
+}
+
+.item-head {
+  position: relative;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+}
+
+.item-head-small {
+  font-size: 85%;
+  align-self: center;
+  font-weight: lighter;
+}
+
+.item-col {
+  width: 95%;
 }
 
 .added {
@@ -285,18 +302,19 @@ li {
   display: flex;
   position: absolute;
   right: 1px;
+  top: 0.5rem;
   height: 100%;
   text-align: center;
-  justify-content: center;
-  vertical-align: center;
-  align-items: center;
+  /* justify-content: center; */
+  /* vertical-align: center; */
+  /* align-items: center; */
   opacity: 0;
   transition: all 0.5s;
 }
 
 .item-over:after {
-  align-self: center;
-  margin: auto;
+  /* align-self: center; */
+  /* margin: auto; */
   content: "\2807";
   font-size: 25px;
 }

@@ -3,8 +3,28 @@ import { Draggable } from "react-beautiful-dnd";
 
 export default function Item(props: any) {
   let themeColor = props.themes[props.color] || props.color;
-  let id = props.index;
+  let id = props.id;
   let importantClass = props.important ? "item-important" : "";
+
+  let daysLeft: any =
+    props.date && typeof props.date === "string"
+      ? new Date(props.date).getUTCDay() - new Date().getUTCDay()
+      : null;
+  switch (daysLeft) {
+    case null:
+      break;
+    case 0:
+      daysLeft = "today";
+      break;
+    case 1:
+      daysLeft = "1 day left";
+      break;
+    case daysLeft > 1:
+      daysLeft = "1 day left";
+      break;
+    default:
+      daysLeft = daysLeft + " days left";
+  }
 
   const dateRef = useRef<any>(null);
 
@@ -45,13 +65,14 @@ export default function Item(props: any) {
   }
 
   return (
-    <Draggable key={props.title} draggableId={props.title} index={id}>
+    <Draggable key={props.title} draggableId={id} index={props.index}>
       {(provided) => (
         <li
           ref={provided.innerRef}
           {...provided.draggableProps}
           {...provided.dragHandleProps}
           className={"itemIn"}
+          id={id}
         >
           <div
             style={styles}
@@ -65,8 +86,12 @@ export default function Item(props: any) {
           >
             <div onClick={onEditClick} className="item-over"></div>
             <div className="item-col">
-              <p>{props.title}</p>
-              {(props.date && typeof props.date === "string" ) ? (
+              <div className="item-head">
+                <p>{props.title}</p>
+                {daysLeft ? <p className="item-head-small">{daysLeft}</p> : null}
+              </div>
+
+              {props.date && typeof props.date === "string" ? (
                 <p ref={dateRef} className="item-date">
                   {new Date(props.date).toDateString()}
                 </p>
